@@ -19,6 +19,7 @@ $RegLSA=Get-ItemProperty -Path HKLM:\System\CurrentControlSet\Control\LSA
 
 if (($RegDeviceGuard.EnableVirtualizationBasedSecurity -ne 1) -or ($RegDeviceGuard.RequirePlatformSecurityFeatures -ne 3) -or ($RegLSA.LsaCfgFlags -ne 1)) {
     #CredentialGuard not enabled, start remediation
+    #CredentialGuard not enabled, start remediation
     Write-Host "Credential Guard not enabled"
 	exit 1
 } else {
