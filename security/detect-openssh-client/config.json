@@ -1,5 +1,5 @@
 {
-    "description" : "Enable credential guard script",
+    "description" : "Detect Open ssh client script",
     "name" : "Enable credential guard script",
     "type" : "Detect",
     "version"  :"1.0.1"
