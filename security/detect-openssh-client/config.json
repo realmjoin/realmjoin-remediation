@@ -1,4 +1,6 @@
-
 {
-    "description" : "Enable credential guard script"
+    "description" : "Enable credential guard script",
+    "name" : "Enable credential guard script",
+    "type" : "Detect",
+    "version"  :"1.0.0"
 }
