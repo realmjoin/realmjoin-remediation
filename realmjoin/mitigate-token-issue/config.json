@@ -3,5 +3,9 @@
     "description" : "Mitigate token issue",
     "name" : "Mitigate token issue",
     "type" : "Detect",
-    "version"  :"1.0.0"
+    "version"  :"1.0.0",
+    "runAsAccountType" : "user",
+    "enforceSignatureCheck" :  true,
+    "runAs32Bit" : true,
+    "isGlobalScript" : true
 }

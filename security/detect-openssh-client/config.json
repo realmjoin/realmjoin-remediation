@@ -1,6 +1,10 @@
 {
     "description" : "Detect Open ssh client script",
-    "name" : "Enable credential guard script",
+    "name" : "Open ssh client",
     "type" : "Detect",
-    "version"  :"1.0.1"
+    "version"  :"1.0.1",
+    "runAsAccountType" : "system",
+    "enforceSignatureCheck" :  true,
+    "runAs32Bit" : true,
+    "isGlobalScript" : false
 }
