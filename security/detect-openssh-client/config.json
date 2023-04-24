@@ -6,30 +6,5 @@
     "runAsAccountType" : "system",
     "enforceSignatureCheck" :  true,
     "runAs32Bit" : true,
-    "isGlobalScript" : false,
-    "detectionScriptParameters" : [
-        {
-            "name" : "Param1",
-            "description":"Param1 Description",
-            "isRequired" : true,
-            "applyDefaultValueWhenNotAssigned":true,
-            "defaultValue":"defaultValue"
-        },
-        {
-            "name" : "Param2",
-            "description":"Param2 Description",
-            "isRequired" : true,
-            "applyDefaultValueWhenNotAssigned":true,
-            "defaultValue":"defaultValue2"
-        }
-    ],
-    "remediationScriptParameters":[
-        {
-            "name" : "Param3",
-            "description":"Param3 Description",
-            "isRequired" : false,
-            "applyDefaultValueWhenNotAssigned":false,
-            "defaultValue":"defaultValue3"
-        }
-    ]
+    "isGlobalScript" : false
 }
