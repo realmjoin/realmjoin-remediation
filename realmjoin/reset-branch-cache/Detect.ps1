@@ -1,7 +1,7 @@
 #=============================================================================================================================
 #
-# Script Name:     Detect-ResetBranchCacheRequired.ps1
-# Description:     Detect if Branch Cache needs to be cleared
+# Script Name:         Detect.ps1
+# Description:         Detect if Branch Cache needs to be cleared
 #
 #=============================================================================================================================
 

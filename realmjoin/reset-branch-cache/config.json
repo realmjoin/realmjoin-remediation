@@ -1,8 +1,8 @@
 {
-    "name": "Clear BranchCache on 85%",
-    "description": "Detect if BranchCache needs to be cleared",
+    "name": "Detect and Remediate - BranchCache",
+    "description": "Detect if BranchCache needs to be cleared (above 85%)",
     "type": "DetectAndRemediate",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "runAsAccountType": "System",
     "enforceSignatureCheck": false,
     "runAs32Bit": false

@@ -1,7 +1,6 @@
-
 {
-    "name": "Detect and Remediate - Credential Guard",
-    "description": "Enable CredentialGuard if not running",
+    "name": "Detect and Remediate - Remove OpenSSH Client",
+    "description": "Remove OpenSSH Client",
     "type": "Detect and Remediate",
     "version": "1.0.1",
     "runAsAccountType": "System",

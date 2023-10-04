@@ -1,8 +1,7 @@
 #====================================
 #
-# Script Name:     Remediate-RealmJoinTokenIssue.ps1
+# Script Name:     Remediate.ps1
 # Description:     Delete RealmJoin token2.dat if found.
-# Run Scope:       USER
 # Changelog:       2022-12-09: Fixes, Improved handling in case of missing token2.dat - Only remediate if token2.dat is found but never kill RealmJoin.
 # References:      https://gist.github.com/Diagg/73275dff62381eb85ad96c6fc15fea81#file-convert-dsregcmd-ps1
 #
@@ -32,7 +31,7 @@ try {
     
 catch {
     $errMsg = $_.Exception.Message
-    return $errMsg
+    Write-Host "Error: $errMsg"
     exit 1
 }# End of catch block
 
