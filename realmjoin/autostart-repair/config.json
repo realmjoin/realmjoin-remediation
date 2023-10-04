@@ -1,0 +1,9 @@
+{
+    "name": "Detect and Remediate - RealmJoin Autostart",
+    "description": "Repair RealmJoin CloudTray Autostart",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "User",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}

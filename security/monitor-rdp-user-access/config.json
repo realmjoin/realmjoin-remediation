@@ -1,0 +1,9 @@
+{
+    "name": "Detect and Remediate - Monitor RDP User access",
+    "description": "List all current members of the Remote Desktop users group.",
+    "type": "Detect",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}

@@ -1,7 +1,7 @@
 {
     "name": "[Detect and Remediate]/[Detect] - [Description]",
     "description": "[Short description]",
-    "type": "[Detect and Remediate]/[Detect]",
+    "type": "[DetectAndRemediate]/[Detect]",
     "version": "1.0.0",
     "runAsAccountType": "[System]/[User]",
     "enforceSignatureCheck": [false]/[true],

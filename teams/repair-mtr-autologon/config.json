@@ -1,0 +1,9 @@
+{
+    "name": "Detect and Remediate - Repair MTR Autologon",
+    "description": "Repair Autologon on Microsoft Teams rooms devices",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}

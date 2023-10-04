@@ -1,7 +1,7 @@
 {
     "name": "Detect and Remediate - Remove OpenSSH Client",
     "description": "Remove OpenSSH Client",
-    "type": "Detect and Remediate",
+    "type": "DetectAndRemediate",
     "version": "1.0.1",
     "runAsAccountType": "System",
     "enforceSignatureCheck": false,
