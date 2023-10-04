@@ -1,0 +1,9 @@
+{
+    "name": "Detect - Safe Guard Hold",
+    "description": "Check if Safe Guard Hold is present in registry",
+    "type": "Detect",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}

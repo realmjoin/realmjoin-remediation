@@ -1,6 +1,6 @@
 #=============================================================================================================================
 #
-# Script Name:     Detect-OpenSSHClient.ps1
+# Script Name:     Detect.ps1
 # Description:     Detect OpenSSHClient
 #                 
 #=============================================================================================================================
@@ -9,7 +9,7 @@ $clients = Get-WindowsCapability -Online | Where-Object { $_.Name -like "OpenSSH
 if ($clients.count -gt 0) {
     foreach ($client in $clients) {
         if ($client.State -eq "Installed") {
-            write-host "Capability '$($client.Name)' found."
+            Write-Host "Capability '$($client.Name)' found."
             exit 1
         }
         else {

@@ -1,8 +1,7 @@
 #====================================
 #
-# Script Name:     Detect-RealmJoinTokenIssue.ps1
+# Script Name:     Detect.ps1
 # Description:     Detect if RealmJoin token has not updated due to authentication problems of client. 
-# Run Scope:       USER
 # Changelog:       2022-12-09: Fixes, Improved handling in case of missing token2.dat - Do not remediate if token2.dat is missing completely
 # References:      https://gist.github.com/Diagg/73275dff62381eb85ad96c6fc15fea81#file-convert-dsregcmd-ps1
 #
@@ -46,6 +45,6 @@ try {
     
 catch {
     $errMsg = $_.Exception.Message
-    return $errMsg
+    Write-Host "Error: $errMsg"
     exit 1
 }# End of catch block

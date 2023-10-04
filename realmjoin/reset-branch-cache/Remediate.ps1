@@ -1,7 +1,7 @@
 #=============================================================================================================================
 #
-# Script Name:     Remediate-ResetBranchCacheRequired.ps1
-# Description:     Reset Branch Cache
+# Script Name:         Remediate.ps1
+# Description:         Reset Branch Cache
 #
 #=============================================================================================================================
 
@@ -13,17 +13,13 @@ $state.CurrentSizeOnDiskAsNumberOfBytes
 $state.MaxCacheSizeAsNumberOfBytes
 
 try {
-
     # clear cache
     Clear-BCCache -Force
     Write-Host "CurrentSizeOnDiskAsNumberOfBytes: $($state.CurrentSizeOnDiskAsNumberOfBytes), MaxCacheSizeAsNumberOfBytes: $($state.MaxCacheSizeAsNumberOfBytes)"
     exit 0
-
 } catch {
-
     # error occured
     $errMsg = $_.Exception.Message
     Write-Host "Error: $errMsg"
     exit 1
-
 }

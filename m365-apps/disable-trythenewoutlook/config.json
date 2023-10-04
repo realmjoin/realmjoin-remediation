@@ -1,0 +1,9 @@
+{
+    "name": "Detect and Remediate - Try the new Outlook",
+    "description": "Hides the 'Try the New Outlook' toggle",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "User",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}

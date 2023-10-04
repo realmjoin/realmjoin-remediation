@@ -1,0 +1,9 @@
+{
+    "name": "[Detect and Remediate]/[Detect] - [Description]",
+    "description": "[Short description]",
+    "type": "[DetectAndRemediate]/[Detect]",
+    "version": "1.0.0",
+    "runAsAccountType": "[System]/[User]",
+    "enforceSignatureCheck": [false]/[true],
+    "runAs32Bit": [false]/[true]
+}
