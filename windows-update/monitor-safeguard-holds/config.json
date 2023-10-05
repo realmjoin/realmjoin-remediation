@@ -1,6 +1,6 @@
 {
-    "name": "Detect - Safe Guard Hold",
-    "description": "Check if Safe Guard Hold is present in registry",
+    "name": "Monitor Windows Update Safeguard holds",
+    "description": "Check if Safeguard Hold is present in registry and report details",
     "type": "Detect",
     "version": "1.0.0",
     "runAsAccountType": "System",

@@ -1,5 +1,5 @@
 {
-    "name": "Detect and Remediate - Try the new Outlook",
+    "name": "Disable 'Try the new Outlook' toggle",
     "description": "Hides the 'Try the New Outlook' toggle",
     "type": "DetectAndRemediate",
     "version": "1.0.0",

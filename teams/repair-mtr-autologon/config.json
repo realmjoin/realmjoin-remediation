@@ -1,5 +1,5 @@
 {
-    "name": "Detect and Remediate - Repair MTR Autologon",
+    "name": "Repair Autologon on MTR devices",
     "description": "Repair Autologon on Microsoft Teams rooms devices",
     "type": "DetectAndRemediate",
     "version": "1.0.0",

@@ -1,6 +1,6 @@
 
 {
-    "name": "Detect and Remediate - Credential Guard",
+    "name": "Enable Credential Guard",
     "description": "Enable CredentialGuard if not running",
     "type": "DetectAndRemediate",
     "version": "1.0.1",

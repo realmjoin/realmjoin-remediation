@@ -1,6 +1,6 @@
 {
-    "name": "Detect and Remediate - Firewall rules sharing and network discovery",
-    "description": "Disable inbound firewall rules for file- and printer-sharing Network Discovery",
+    "name": "Disable inbound firewall rules for sharing and network discovery",
+    "description": "Disable inbound firewall rules for file-/printer-sharing and network discovery",
     "type": "DetectAndRemediate",
     "version": "1.0.0",
     "runAsAccountType": "System",
