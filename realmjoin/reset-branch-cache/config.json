@@ -1,5 +1,5 @@
 {
-    "name": "Detect and Remediate - BranchCache",
+    "name": "Clear BranchCache above 85% storage size",
     "description": "Detect if BranchCache needs to be cleared (above 85%)",
     "type": "DetectAndRemediate",
     "version": "1.0.1",

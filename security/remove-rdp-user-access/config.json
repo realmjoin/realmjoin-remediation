@@ -1,6 +1,6 @@
 {
-    "name": "Detect and Remediate - Remove RDP User access",
-    "description": "Check if the current user of a client is member of the Remote Desktop users group and remove him.",
+    "name": "Remove current user from Remote Desktop users group",
+    "description": "Check if the current user of a client is member of the Remote Desktop users group and remove him",
     "type": "DetectAndRemediate",
     "version": "1.0.0",
     "runAsAccountType": "System",

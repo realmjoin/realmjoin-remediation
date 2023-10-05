@@ -1,6 +1,6 @@
 {
-    "name": "Detect and Remediate - Disable Outlook Suggested Replies",
-    "description": "Turns off Suggested Replies in Outlook",
+    "name": "Disable suggested replies in Outlook",
+    "description": "Turns off suggested replies in Outlook",
     "type": "DetectAndRemediate",
     "version": "1.0.0",
     "runAsAccountType": "User",
