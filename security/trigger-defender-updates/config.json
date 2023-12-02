@@ -1,0 +1,9 @@
+{
+    "name": "Trigger Defender updates",
+    "description": "Trigger updates for Defender via Update-MpSignature",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
