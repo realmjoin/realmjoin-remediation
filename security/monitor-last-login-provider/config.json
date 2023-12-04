@@ -1,0 +1,9 @@
+{
+    "name": "Monitor Last Login Provider",
+    "description": "Check last login method of users and detect if they are using Windows Hello.",
+    "type": "Detect",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
