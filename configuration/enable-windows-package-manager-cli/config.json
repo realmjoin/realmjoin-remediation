@@ -1,0 +1,9 @@
+{
+    "name": "Enable Windows Package Manager CLI",
+    "description": "Enable Windows Package Manager Command Line Interfaces",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
