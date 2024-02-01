@@ -1,0 +1,9 @@
+{
+    "name": "Disable HP Audio Analytics Service",
+    "description": "Stop HP Audio Analytics Service and disable automatic start.",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
