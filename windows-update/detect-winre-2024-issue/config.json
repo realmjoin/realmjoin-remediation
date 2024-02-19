@@ -1,0 +1,9 @@
+{
+    "name": "Detect WinRE 2024 Patch issue",
+    "description": "Detect if a client will run into the Windows update KB5034441 installation issue.",
+    "type": "Detect",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
