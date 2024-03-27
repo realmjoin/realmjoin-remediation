@@ -19,12 +19,12 @@ if(($null -ne $currentValue) -and ($null -ne $currentValue64Bit)) {
 	Write-Host "Registry keys found."
 	if(($currentValue -eq 1) -and ($currentValue64Bit -eq 1)) {
 		Write-Host "Registry keys found and values correct."	
-		#exit 0
+		exit 0
 	} else {
 		Write-Host "Registry keys found and but value/s not correct."
-		#exit 1
+		exit 1
 	}
 } else {
 	Write-Host "Registry key/s not found."
-	#exit 1
+	exit 1
 }
