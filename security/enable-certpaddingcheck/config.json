@@ -2,7 +2,7 @@
     "name": "Enable Certificate Padding Check",
     "description": "Configure WinVerifyTrust function to perform strict Windows Authenticode signature verification for PE files.",
     "type": "DetectAndRemediate",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "runAsAccountType": "System",
     "enforceSignatureCheck": false,
     "runAs32Bit": false
