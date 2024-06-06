@@ -5,13 +5,19 @@
 #
 #=============================================================================================================================
 
-Import-Module (Get-ItemPropertyValue -Path "Registry::HKLM\SOFTWARE\RealmJoin\Variables" -Name RealmjoinCraftSupportModulePath)
 
-# get current state
-$state = Get-BCDataCache
+# get current state, catch BranchCache needs reset
+try {
+    $state = Get-BCDataCache -EA Stop
+} catch {
+    # problem detected
+    Write-Host "BranchCache broken, needs Reset"
+    exit 1
+}
+
+# BrancCache works, check if Clear needed
 $state.CurrentSizeOnDiskAsNumberOfBytes
 $state.MaxCacheSizeAsNumberOfBytes
-
 if ($state.CurrentSizeOnDiskAsNumberOfBytes -gt ($state.MaxCacheSizeAsNumberOfBytes * .85)) {
     # problem detected
     Write-Host "CurrentSizeOnDiskAsNumberOfBytes: $($state.CurrentSizeOnDiskAsNumberOfBytes), MaxCacheSizeAsNumberOfBytes: $($state.MaxCacheSizeAsNumberOfBytes)"
