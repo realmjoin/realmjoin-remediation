@@ -1,0 +1,9 @@
+{
+    "name": "Remove Powershell 2.0",
+    "description": "Remove Powershell v2 (Support ended 2020) - PowerShell 2.0 has been officially deprecated by Microsoft - largely due to a lack of security features.",
+    "type": "DetectAndRemediate",
+    "version": "1.0.1",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}

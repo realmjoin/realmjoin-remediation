@@ -1,8 +1,8 @@
 {
-    "name": "Clear BranchCache above 85% storage size",
-    "description": "Detect if BranchCache needs to be cleared (above 85%)",
+    "name": "Reset or Clear BranchCache",
+    "description": "Detect if BranchCache needs to be resetted or cleared (if above 85% storage size)",
     "type": "DetectAndRemediate",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "runAsAccountType": "System",
     "enforceSignatureCheck": false,
     "runAs32Bit": false
