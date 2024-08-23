@@ -1,0 +1,9 @@
+{
+    "name": "Install capability Defender Sense Client",
+    "description": "Check if Sense service is visible and install Defender sense client if not.",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
