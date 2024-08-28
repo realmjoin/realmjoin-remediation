@@ -1,0 +1,9 @@
+{
+  "name": "Check PKfail vulnerability",
+  "description": "Checks for PKfail vulnerability",
+  "type": "Detect",
+  "version": "1.0.0",
+  "runAsAccountType": "System",
+  "enforceSignatureCheck": false,
+  "runAs32Bit": false
+}
