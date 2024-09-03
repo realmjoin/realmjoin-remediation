@@ -1,0 +1,9 @@
+{
+    "name": "Fix broken Windows Task Scheduler",
+    "description": "Detects if the Windows Task Scheulder is broken and fixes it.",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
