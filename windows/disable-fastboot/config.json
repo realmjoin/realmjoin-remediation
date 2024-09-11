@@ -1,0 +1,9 @@
+{
+    "name": "Disable Fastboot",
+    "description": "Checks and disables Fastboot via registry",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
