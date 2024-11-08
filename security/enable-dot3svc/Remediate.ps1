@@ -11,10 +11,10 @@ try {
     # do some crazy stuff
     Set-Service -Name dot3svc -StartupType Automatic -Status Running -ErrorAction Stop
     Write-Host "Successfully configured and started dot3svc service."
-    #exit 0
+    exit 0
 } catch {
     # error occured
     $errMsg = $_.Exception.Message
     Write-Host "Error: $errMsg"
-    #exit 1
+    exit 1
 }
