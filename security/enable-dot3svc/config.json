@@ -1,0 +1,9 @@
+{
+    "name": "Enable dot3svc service for 802.1X authentication",
+    "description": "If 802.1X profile is configured, the dot3svc service must be started",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
