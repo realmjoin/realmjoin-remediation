@@ -8,7 +8,6 @@
 
 
 try {
-    # do some crazy stuff
     Set-Service -Name dot3svc -StartupType Automatic -Status Running -ErrorAction Stop
     Write-Host "Successfully configured and started dot3svc service."
     exit 0
