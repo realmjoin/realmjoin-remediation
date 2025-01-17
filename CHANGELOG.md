@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2025-01-17
+- Updated Repair and trigger M365 Apps Updates
+
 ## 2024-08-01
 
 - Added PKfail check

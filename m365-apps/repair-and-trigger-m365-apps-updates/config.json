@@ -2,7 +2,7 @@
     "name": "Repair and trigger M365 Apps Updates",
     "description": "Set startup type of M365 Apps Click to Run Service to Automatic and trigger updates.",
     "type": "DetectAndRemediate",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "runAsAccountType": "System",
     "enforceSignatureCheck": false,
     "runAs32Bit": false
