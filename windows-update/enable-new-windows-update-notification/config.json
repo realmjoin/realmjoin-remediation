@@ -1,6 +1,6 @@
 {
-    "name": "Enable new Windows update notification",
-    "description": "Enable new Windows update notification via registry key",
+    "name": "Enable Windows Update restart notification",
+    "description": "Enable Windows Update restart notification via registry key",
     "type": "DetectAndRemediate",
     "version": "1.0.0",
     "runAsAccountType": "System",

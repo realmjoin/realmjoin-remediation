@@ -1,5 +1,9 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2025-01-24
+- Added Enable Windows Update restart notification
+- Repair and trigger M365 Apps Updates: Active trigger with user prompt for outstanding updates
+
 ## 2025-01-17
 - Updated Repair and trigger M365 Apps Updates
 

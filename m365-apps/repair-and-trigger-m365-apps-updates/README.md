@@ -1,7 +1,9 @@
 # Repair and trigger M365 Apps Updates
 
-Set startup type of M365 Apps "Click to Run Service" to Automatic and trigger updates on each check via resetting UpdateDetectionLastRunTime and start Office C2R Process.
+Check if startup type of M365 Apps "Click to Run Service" is set to Automatic and repair if needed.
 
-Detect next Update on RegistryKey "HKLM:\SOFTWARE\Microsoft\Office\ClickToRun\Updates\UpdatesReadyToApply" and run Update Process with User prompt.
+Trigger updates on **each detection run**:
+- reset "HKLM:\SOFTWARE\Microsoft\Office\ClickToRun\Updates\UpdateDetectionLastRunTime" and start Office C2R process to **search for updates without user prompt**
+- detect **outstanding update installation** via "HKLM:\SOFTWARE\Microsoft\Office\ClickToRun\Updates\UpdatesReadyToApply" and start update process **with user prompt**
 
-Adapted from example script in Intune: "Restart stopped Office C2R svc".
+Enhanced version of example script in Intune: "Restart stopped Office C2R svc".
