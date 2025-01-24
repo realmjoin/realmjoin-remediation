@@ -1,0 +1,9 @@
+{
+    "name": "Enable new Windows update notification",
+    "description": "Enable new Windows update notification via registry key",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
