@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2025-02-05
+- Added Trigger TPM Health Attestation Certificate retrieval
+
 ## 2025-01-24
 - Added Enable Windows Update restart notification
 - Repair and trigger M365 Apps Updates: Active trigger with user prompt for outstanding updates
