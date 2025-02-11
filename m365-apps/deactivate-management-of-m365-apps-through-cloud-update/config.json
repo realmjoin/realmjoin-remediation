@@ -1,0 +1,9 @@
+{
+    "name": "Deactivate the management of M365 Apps through cloud update",
+    "description": "Cloud Update (managed via the M365 Apps Admin Center) only supports Current Channel and Monthly Enterprise Channel. As soon as devices/users are onboarded to Cloud Update, they are locked and can't be moved to another channel as Cloud Update overwrites and ignores any policy/channel set via Intune or other means. To be able to move users/devices to another channel, they must be offboarded from cloud update. This remediation deactivates the management through cloud update by making sure the registry key IgnoreGPO has a value of zero. Assign this remediation to all your M365 Apps Update Channel entra groups as INCLUDE and also assign it as EXCLUDE to the M365 Apps Update Channel entra groups for Current Channel and Monthly Enterprise Channel.",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
