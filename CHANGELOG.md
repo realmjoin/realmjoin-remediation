@@ -1,5 +1,9 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2025-02-11
+- Added Deactivate the management of M365 Apps through cloud update
+- Added Activate the management of M365 Apps through cloud update
+
 ## 2025-02-05
 - Added Trigger TPM Health Attestation Certificate retrieval
 
