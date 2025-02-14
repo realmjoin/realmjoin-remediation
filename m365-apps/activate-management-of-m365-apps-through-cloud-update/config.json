@@ -1,9 +1,0 @@
-{
-    "name": "Activate the management of M365 Apps through cloud update",
-    "description": "As soon as devices/users are onboarded to Cloud Update (managed via the M365 Apps Admin Center), they are locked to Cloud Update and ignore settings coming via other means (like Intune) by setting a registry key. This remediation makes sure that devices are properly onboarded to Cloud Update by restoring the desired value of the registry key.",
-    "type": "DetectAndRemediate",
-    "version": "1.0.0",
-    "runAsAccountType": "System",
-    "enforceSignatureCheck": false,
-    "runAs32Bit": false
-}

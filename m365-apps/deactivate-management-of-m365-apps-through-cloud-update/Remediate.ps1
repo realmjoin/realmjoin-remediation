@@ -1,18 +1,33 @@
 #=============================================================================================================================
 #
 # Script Name:         Remediate.ps1
-# Description:         Make sure device is not onboarded and locked to M365 Apps Cloud Update. If onboarded/locked, set a registry key to offboard it.
-# Changelog:           2025-02-10: Initial version
+# Description:         Detect if device is onboarded and locked to M365 Apps Cloud Update. If onboarded/locked, remediation starts and sets a registry key to offboard it.
+# Changelog:           2025-02-14: Improved handling to also support "choose your own" channel scenarios
+#                      2025-02-10: Initial version
 #
 #=============================================================================================================================
 
 try {
     # Variable declaration
+    ## General
     $cloudUpdatePath = "HKLM:\SOFTWARE\Policies\Microsoft\cloud\office\16.0\Common\officeupdate"
-    $cloudUpdateKeyName = "ignoregpo"
-    $cloudUpdateKeyType = "DWORD" # needed for remediation
-    $cloudUpdateValueShould = "0"
-    
+    $cloudUpdatePathExists = $null
+
+    ## IgnoreGPO
+    $keyNameIgnoreGPO = "ignoregpo"
+    $keyTypeIgnoreGPO= "DWORD" # needed for remediation
+    $keyExistsIgnoreGPO = $null
+    $desiredValueIgnoreGPO = "0"
+    $actualValueIgnoreGPO = $null
+    $valueIsWrongIgnoreGPO = $null
+
+    ## UpdateBranch
+    $keyNameUpdateBranch = "updatebranch"
+    $keyExistsUpdateBranch = $null
+
+    ## UpdatePath
+    $keyNameUpdatePath = "updatepath"
+    $keyExistsUpdatePath = $null    
 
     # Functions
     Function Test-RegistryPath {
@@ -57,24 +72,41 @@ try {
     }
 
     # Main
-    $cloudUpdateKeyExists = Test-RegistryKey -Path $cloudUpdatePath -Key $cloudUpdateKeyName
-    if (-not $cloudUpdateKeyExists) {
+    $cloudUpdatePathExists = Test-RegistryPath -Path $cloudUpdatePath
+    if (-not $cloudUpdatePathExists) {
         # Not onboarded to Cloud Update - all good
         Write-Host "Machine not ONBOARDED to Cloud Update - OK."
-        exit 0   
     } else {
-        # Onboarded to Cloud Update - checking reg key value
-        $cloudUpdateValueIs = Test-RegistryValue -Path $cloudUpdatePath -Key $cloudUpdateKeyName
-        if ($cloudUpdateValueIs -eq $cloudUpdateValueShould) {
-            Write-Host "Machine onboarded but not LOCKED to Cloud Update - OK."
-            exit 0   
+        # Onboarded to Cloud Update - checking reg keys
+        Write-Host "Fixing reg keys to make sure Cloud Update keys are ingored ..."
+        ## IgnoreGPO
+        $actualValueIgnoreGPO = Test-RegistryValue -Path $cloudUpdatePath -Key $keyNameIgnoreGPO
+        if ($desiredValueIgnoreGPO -ne $actualValueIgnoreGPO ) {
+            $valueIsWrongIgnoreGPO = $true
         } else {
-            Set-ItemProperty -Path $cloudUpdatePath -Name $cloudUpdateKeyName -Value $cloudUpdateValueShould -Type $cloudUpdateKeyType -Force
-            Write-Host "Machine was onboarded and LOCKED to Cloud Update - Remediated."
+            $valueIsWrongIgnoreGPO = $false
+        }
+        if ($valueIsWrongIgnoreGPO) {
+            Write-Host "Setting Key $keyNameIgnoreGPO to $desiredValueIgnoreGPO"
+            Set-ItemProperty -Path $cloudUpdatePath -Name $keyNameIgnoreGPO -Value $desiredValueIgnoreGPO -Type $keyTypeIgnoreGPO -Force
+        }
+
+        ## UpdateBranch
+        $keyExistsUpdateBranch = Test-RegistryKey -Path $cloudUpdatePath -Key $keyNameUpdateBranch
+        if ($keyExistsUpdateBranch) {
+            Write-Host "Removing Key $keyNameUpdateBranch"
+            Remove-ItemProperty -Path $cloudUpdatePath -Name $keyNameUpdateBranch -Force
+        }
+
+        ## UpdatePath
+        $keyExistsUpdatePath = Test-RegistryKey -Path $cloudUpdatePath -Key $keyNameUpdatePath
+        if ($keyExistsUpdatePath) {
+            Write-Host "Removing Key $keyNameUpdatePath"
+            Remove-ItemProperty -Path $cloudUpdatePath -Name $keyNameUpdatePath -Force
         }
     }
-    
-    # Succes if no errors occured.
+
+    # Success if no errors occurs
     exit 0
 }
 catch {

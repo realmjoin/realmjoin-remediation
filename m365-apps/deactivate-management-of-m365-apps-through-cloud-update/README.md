@@ -16,9 +16,15 @@ To regain control the following reg key is set accordingly:
 - Key: IgnoreGPO
 - Value: 0
 
+To allow scenarios, where users should be able to choose their own update channel via the Office UI, also the following keys are removed:
+
+- Path: HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\cloud\office\16.0\Common\officeupdate
+- Key 1: updatebranch
+- Key 2: updatepath
+
 ## Recommended assignment
 
-Assign this remediation to all your M365 Apps Update Channel entra groups as INCLUDE and also assign it as EXCLUDE to the M365 Apps Update Channel entra groups for Current Channel and Monthly Enterprise Channel.
+Assign this remediation to all your M365 Apps Update Channel entra groups that are not supported by Cloud Update as INCLUDE. At the moment only Current Channel and Monthly Enterprise Channel are supported.
 
 For TF-managed environments that means:
 
@@ -29,11 +35,6 @@ INCLUDE:
 - CFG - M365 Apps - Channel - 2 (CurrentPreview) - TF
 - CFG - M365 Apps - Channel - 5 (SemiAnnualPreview) - TF
 - CFG - M365 Apps - Channel - 6 (SemiAnnual) - TF
-
-EXCLUDE:
-
-- CFG - M365 Apps - Channel - 3 (Current) - TF
-- CFG - M365 Apps - Channel - 4 (MonthlyEnterprise) - TF
 
 Make sure to set an appropiate filter, e.g. EXCLUDE: Win - DeviceType - MTR, Surface Hub, HoloLens, AVD Pooled - TF
 
