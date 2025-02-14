@@ -2,17 +2,32 @@
 #
 # Script Name:         Detect.ps1
 # Description:         Detect if device is onboarded and locked to M365 Apps Cloud Update. If onboarded/locked, remediation starts and sets a registry key to offboard it.
-# Changelog:           2025-02-10: Initial version
+# Changelog:           2025-02-14: Improved handling to also support "choose your own" channel scenarios
+#                      2025-02-10: Initial version
 #
 #=============================================================================================================================
 
 try {
     # Variable declaration
+    ## General
     $cloudUpdatePath = "HKLM:\SOFTWARE\Policies\Microsoft\cloud\office\16.0\Common\officeupdate"
-    $cloudUpdateKeyName = "ignoregpo"
-    $cloudUpdateKeyType = "DWORD" # needed for remediation
-    $cloudUpdateValueShould = "0"
-    
+    $cloudUpdatePathExists = $null
+
+    ## IgnoreGPO
+    $keyNameIgnoreGPO = "ignoregpo"
+    $keyTypeIgnoreGPO= "DWORD" # needed for remediation
+    $keyExistsIgnoreGPO = $null
+    $desiredValueIgnoreGPO = "0"
+    $actualValueIgnoreGPO = $null
+    $valueIsWrongIgnoreGPO = $null
+
+    ## UpdateBranch
+    $keyNameUpdateBranch = "updatebranch"
+    $keyExistsUpdateBranch = $null
+
+    ## UpdatePath
+    $keyNameUpdatePath = "updatepath"
+    $keyExistsUpdatePath = $null    
 
     # Functions
     Function Test-RegistryPath {
@@ -57,20 +72,30 @@ try {
     }
 
     # Main
-    $cloudUpdateKeyExists = Test-RegistryKey -Path $cloudUpdatePath -Key $cloudUpdateKeyName
-    if (-not $cloudUpdateKeyExists) {
+    $cloudUpdatePathExists = Test-RegistryPath -Path $cloudUpdatePath
+    if (-not $cloudUpdatePathExists) {
         # Not onboarded to Cloud Update - all good
         Write-Host "Machine not ONBOARDED to Cloud Update - OK."
         exit 0   
     } else {
-        # Onboarded to Cloud Update - checking reg key value
-        $cloudUpdateValueIs = Test-RegistryValue -Path $cloudUpdatePath -Key $cloudUpdateKeyName
-        if ($cloudUpdateValueIs -eq $cloudUpdateValueShould) {
-            Write-Host "Machine onboarded but not LOCKED to Cloud Update - OK."
-            exit 0   
-        } else {
+        # Onboarded to Cloud Update - checking reg keys
+        ## IgnoreGPO
+        $actualValueIgnoreGPO = Test-RegistryValue -Path $cloudUpdatePath -Key $keyNameIgnoreGPO
+        $valueIsWrongIgnoreGPO = if ($desiredValueIgnoreGPO -ne $actualValueIgnoreGPO ) {return $true} else {return $false}
+
+        ## UpdateBranch
+        $keyExistsUpdateBranch = Test-RegistryKey -Path $cloudUpdatePath -Key $keyNameUpdateBranch
+
+        ## UpdatePath
+        $keyExistsUpdatePath = Test-RegistryKey -Path $cloudUpdatePath -Key $keyNameUpdatePath
+        
+
+        if ($valueIsWrongIgnoreGPO -or $keyExistsUpdateBranch -or $keyExistsUpdatePath) {
             Write-Host "Machine is onboarded and LOCKED to Cloud Update - Remediate."
             exit 1
+        } else {
+            Write-Host "Machine onboarded but not LOCKED to Cloud Update - OK."
+            exit 0
         }
     }
 }
