@@ -81,7 +81,11 @@ try {
         # Onboarded to Cloud Update - checking reg keys
         ## IgnoreGPO
         $actualValueIgnoreGPO = Test-RegistryValue -Path $cloudUpdatePath -Key $keyNameIgnoreGPO
-        $valueIsWrongIgnoreGPO = if ($desiredValueIgnoreGPO -ne $actualValueIgnoreGPO ) {return $true} else {return $false}
+        if ($desiredValueIgnoreGPO -ne $actualValueIgnoreGPO ) {
+            $valueIsWrongIgnoreGPO = $true
+        } else {
+            $valueIsWrongIgnoreGPO = $false
+        }
 
         ## UpdateBranch
         $keyExistsUpdateBranch = Test-RegistryKey -Path $cloudUpdatePath -Key $keyNameUpdateBranch

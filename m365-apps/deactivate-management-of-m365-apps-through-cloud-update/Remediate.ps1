@@ -81,20 +81,27 @@ try {
         Write-Host "Fixing reg keys to make sure Cloud Update keys are ingored ..."
         ## IgnoreGPO
         $actualValueIgnoreGPO = Test-RegistryValue -Path $cloudUpdatePath -Key $keyNameIgnoreGPO
-        $valueIsWrongIgnoreGPO = if ($desiredValueIgnoreGPO -ne $actualValueIgnoreGPO ) {return $true} else {return $false}
+        if ($desiredValueIgnoreGPO -ne $actualValueIgnoreGPO ) {
+            $valueIsWrongIgnoreGPO = $true
+        } else {
+            $valueIsWrongIgnoreGPO = $false
+        }
         if ($valueIsWrongIgnoreGPO) {
+            Write-Host "Setting Key $keyNameIgnoreGPO to $desiredValueIgnoreGPO"
             Set-ItemProperty -Path $cloudUpdatePath -Name $keyNameIgnoreGPO -Value $desiredValueIgnoreGPO -Type $keyTypeIgnoreGPO -Force
         }
 
         ## UpdateBranch
         $keyExistsUpdateBranch = Test-RegistryKey -Path $cloudUpdatePath -Key $keyNameUpdateBranch
         if ($keyExistsUpdateBranch) {
+            Write-Host "Removing Key $keyNameUpdateBranch"
             Remove-ItemProperty -Path $cloudUpdatePath -Name $keyNameUpdateBranch -Force
         }
 
         ## UpdatePath
         $keyExistsUpdatePath = Test-RegistryKey -Path $cloudUpdatePath -Key $keyNameUpdatePath
         if ($keyExistsUpdatePath) {
+            Write-Host "Removing Key $keyNameUpdatePath"
             Remove-ItemProperty -Path $cloudUpdatePath -Name $keyNameUpdatePath -Force
         }
     }
