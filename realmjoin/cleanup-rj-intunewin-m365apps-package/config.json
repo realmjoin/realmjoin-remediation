@@ -1,0 +1,9 @@
+{
+    "name": "Cleanup RealmJoin IntuneWin M365 Apps for Enterprise Package",
+    "description": "This Remediation deletes the RjImeHost user part of the RealmJoin IntuneWin M365 Apps for Enterprise Package.",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
