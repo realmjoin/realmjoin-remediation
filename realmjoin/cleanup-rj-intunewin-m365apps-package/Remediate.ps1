@@ -44,7 +44,7 @@ try {
     if ($m365AppsRjImeHostUserPartPathExists) {
         # Exists - Remediate
         Write-Output "RjImeHost user part detected - Deleting ..."
-        Remove-RegistryPath
+        Remove-RegistryPath -Path $m365AppsRjImeHostUserPartPath
         Write-Output "Removal succeeded - OK"
         exit 0
     } else {
