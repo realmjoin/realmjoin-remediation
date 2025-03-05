@@ -13,19 +13,6 @@ try {
     $m365AppsRjImeHostUserPartPathExists = $null
 
     # Functions
-    Function Test-RegistryPath {
-        param (
-            [parameter(Mandatory=$true)][ValidateNotNullOrEmpty()]$Path
-        )
-        
-        try {
-            Test-Path $Path -ErrorAction Stop | Out-Null
-            return $true
-        } catch {
-            return $false
-        }
-    }
-
     Function Remove-RegistryPath {
         param (
             [parameter(Mandatory=$true)][ValidateNotNullOrEmpty()]$Path
@@ -37,11 +24,10 @@ try {
             throw "Could not remove reg path $Path"
         }
     }
-
-
+    
 
     # Main
-    $m365AppsRjImeHostUserPartPathExists = Test-RegistryPath -Path $m365AppsRjImeHostUserPartPath
+    $m365AppsRjImeHostUserPartPathExists = Test-Path -Path $m365AppsRjImeHostUserPartPath
     if ($m365AppsRjImeHostUserPartPathExists) {
         # Exists - Remediate
         Write-Output "RjImeHost user part detected - NOK"

@@ -1,5 +1,9 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2025-03-05
+- Improved Cleanup RealmJoin IntuneWin M365 Apps for Enterprise Package
+- Improved: Deactivate the management of M365 Apps through cloud update
+
 ## 2025-02-20
 - Added Cleanup RealmJoin IntuneWin M365 Apps for Enterprise Package
 
