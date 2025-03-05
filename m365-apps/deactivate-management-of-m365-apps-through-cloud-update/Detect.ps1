@@ -2,7 +2,8 @@
 #
 # Script Name:         Detect.ps1
 # Description:         Detect if device is onboarded and locked to M365 Apps Cloud Update. If onboarded/locked, remediation starts and sets a registry key to offboard it.
-# Changelog:           2025-02-14: Improved handling to also support "choose your own" channel scenarios
+# Changelog:           2025-03-05: Fixes for some scenarios
+#                      2025-02-14: Improved handling to also support "choose your own" channel scenarios
 #                      2025-02-10: Initial version
 #
 #=============================================================================================================================
@@ -30,19 +31,6 @@ try {
     $keyExistsUpdatePath = $null    
 
     # Functions
-    Function Test-RegistryPath {
-        param (
-            [parameter(Mandatory=$true)][ValidateNotNullOrEmpty()]$Path
-        )
-        
-        try {
-            Test-Path $Path -ErrorAction Stop | Out-Null
-            return $true
-        } catch {
-            return $false
-        }
-    }
-
     Function Test-RegistryKey {
         param (
             [parameter(Mandatory=$true)][ValidateNotNullOrEmpty()]$Path,
@@ -72,7 +60,7 @@ try {
     }
 
     # Main
-    $cloudUpdatePathExists = Test-RegistryPath -Path $cloudUpdatePath
+    $cloudUpdatePathExists = Test-Path -Path $cloudUpdatePath
     if (-not $cloudUpdatePathExists) {
         # Not onboarded to Cloud Update - all good
         Write-Host "Machine not ONBOARDED to Cloud Update - OK."
