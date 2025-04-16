@@ -1,0 +1,9 @@
+{
+    "name": "Verify and trigger Windows activation",
+    "description": "Checks and triggers Windows activation via BIOS key or clean-up stale MAK key",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
