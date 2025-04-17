@@ -13,7 +13,7 @@
 #=============================================================================================================================
 
 # define Variables
-:$allProgramsWmiObject = Get-WmiObject -Class Win32_Product
+$allProgramsWmiObject = Get-WmiObject -Class Win32_Product
 $uninstalledList = ""
 
 # uninstallations

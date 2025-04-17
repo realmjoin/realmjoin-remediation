@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2025-04-17
+- Fixed Remove HP applications
+
 ## 2025-04-16
 - Added Remove HP applications
 - Added Verify and trigger Windows activation
