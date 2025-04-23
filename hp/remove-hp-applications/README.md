@@ -9,8 +9,8 @@ Uninstalls the following list of (pre-installed) HP applications if found:
 - HP Sure Click Security Browser
 - HP Sure Sense
 - HP Sure Sense Installer
-- HP Sure Run
+- HP Sure Run Module
 - HP JumpStart
 - HP Wolf Security Application Support for Sure Sense
 - HP Wolf Security Application Support for Windows
-- HP Wolf Security Application Support for Chrome
+- HP Wolf Security Application Support for Chrome*

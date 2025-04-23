@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2025-04-22
+- Updated Remove HP applications
+
 ## 2025-04-17
 - Fixed Remove HP applications
 
