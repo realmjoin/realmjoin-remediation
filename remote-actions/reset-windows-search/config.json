@@ -1,0 +1,9 @@
+{
+    "name": "Reset Windows Search",
+    "description": "Reset Windows Search if it is unresponsive or the search results don't appear as expected",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "User",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}

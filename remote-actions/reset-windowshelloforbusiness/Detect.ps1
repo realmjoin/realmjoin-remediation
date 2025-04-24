@@ -2,6 +2,7 @@
 #
 # Script Name:         Detect.ps1
 # Description:         Check if Windows Hello is configured for local users
+# Changelog:           2025-04-24: Updated execution logic.
 #
 #=============================================================================================================================
 
@@ -10,9 +11,15 @@ $baseRegistryPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Authenticat
 $keyName = "LogonCredsAvailable"
 $expectedValue = 1
 
+$path = "HKCU:\SOFTWARE\RealmJoin\Custom\PAR\reset-windowshelloforbusiness"
+$name = "Executed"
+$value = 0
+$type = [Microsoft.Win32.RegistryValueKind]::DWord
+
+# get amount of configured WHfB PINs
+$foundConfiguredPINs = 0
 $pathExists = Test-Path -Path $baseRegistryPath
 if ($pathExists) {
-    $foundConfiguredPINs = 0
     # search for LogonCredsAvailable under all SIDs
     Get-ChildItem -Path $baseRegistryPath | ForEach-Object {
         if ($_.PSIsContainer) {
@@ -24,6 +31,20 @@ if ($pathExists) {
             }
         }
     }
+} else {
+    Write-Host "WHfB PIN provider not found. Nothing to do."
+    exit 0
+}
+
+# get status
+$parStatus = (Get-ItemPropertyValue -Path $path -Name $name -ErrorAction SilentlyContinue)
+if($parStatus -eq 1) {
+    Write-Host "Remediation did run. Configured WHfB PINs now: $($foundConfiguredPINs)"
+    # Reset status
+    Set-ItemProperty -Path $path -Name $name -Value $value -Type $type -Force | Out-Null
+    exit 0
+} else {
+    Write-Host "Start remediation."
     if($foundConfiguredPINs -gt 0) {
         Write-Host "Found configured WHfB PIN for $($foundConfiguredPINs) user(s)."
         exit 1
@@ -31,7 +52,4 @@ if ($pathExists) {
         Write-Host "No configured WHfB PIN found. Nothing to do."
         exit 0
     }
-} else {
-    Write-Host "WHfB PIN provider not found. Nothing to do."
-    exit 0
 }

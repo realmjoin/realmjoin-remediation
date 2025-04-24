@@ -2,7 +2,7 @@
     "name": "Reset Windows Hello for Business",
     "description": "Delete Windows Hello for Business Container",
     "type": "DetectAndRemediate",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "runAsAccountType": "User",
     "enforceSignatureCheck": false,
     "runAs32Bit": false

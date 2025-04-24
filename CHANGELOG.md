@@ -1,5 +1,10 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2025-04-24
+- Added Reset Windows Search
+- Updated Reset Windows Hello for Business
+- Updated Trigger TPM Health Attestation Certificate retrieval
+
 ## 2025-04-22
 - Updated Remove HP applications
 
