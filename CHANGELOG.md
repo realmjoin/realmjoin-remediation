@@ -1,6 +1,7 @@
 # RealmJoin Remediation Scripts Changelog
 
 ## 2025-05-13
+- Added Show File Extensions in Windows Explorer
 - Added Trigger Microsoft Store App Updates
 
 ## 2025-04-24

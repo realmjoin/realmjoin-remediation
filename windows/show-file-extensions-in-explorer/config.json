@@ -1,0 +1,9 @@
+{
+    "name": "Show File Extensions in Windows Explorer",
+    "description": "Enable showing File Extensions in Windows Explorer via registry key HideFileExt",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "User",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
