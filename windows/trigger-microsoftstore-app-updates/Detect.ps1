@@ -6,6 +6,12 @@
 #=============================================================================================================================
 
 try {
+	# clean-up old scheduled task
+	$taskName = "GKTriggerWindowsStoreAppUpdates"
+	if (Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue){
+		Unregister-ScheduledTask -TaskName $TaskName -Confirm $false
+	}
+
 	# trigger updates
     Get-CimInstance -Namespace "root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName "UpdateScanMethod" | Out-Null
 	
