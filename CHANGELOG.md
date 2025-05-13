@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2025-05-13
+- Added Trigger Microsoft Store App Updates
+
 ## 2025-04-24
 - Added Reset Windows Search
 - Updated Reset Windows Hello for Business
