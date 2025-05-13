@@ -1,0 +1,9 @@
+{
+    "name": "Trigger Microsoft Store App Updates",
+    "description": "Triggers search and installation of outstanding Microsoft Store app updates",
+    "type": "Detect",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
