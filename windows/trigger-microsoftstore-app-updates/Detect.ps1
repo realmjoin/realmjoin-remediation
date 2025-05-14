@@ -2,14 +2,15 @@
 #
 # Script Name:         Detect.ps1
 # Description:         Invoke method "UpdateScanMethod" of class "MDM_EnterpriseModernAppManagement_AppManagement01"
+# Changelog:           2025-05-13: Inital version
 #
 #=============================================================================================================================
 
 try {
 	# clean-up old scheduled task
 	$taskName = "GKTriggerWindowsStoreAppUpdates"
-	if (Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue){
-		Unregister-ScheduledTask -TaskName $TaskName -Confirm $false
+	if (Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue){
+		Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
 	}
 
 	# trigger updates
