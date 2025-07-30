@@ -2,7 +2,7 @@
     "name": "Mitigate RealmJoin authentication token issues",
     "description": "Detect if RealmJoin lost authentication and is not working properly due to token issues",
     "type": "DetectAndRemediate",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "runAsAccountType": "User",
     "enforceSignatureCheck": false,
     "runAs32Bit": false
