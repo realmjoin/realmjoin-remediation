@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2025-07-30
+- Update Mitigate RealmJoin authentication token issues (include new token file)
+
 ## 2025-05-13
 - Added Show File Extensions in Windows Explorer
 - Added Trigger Microsoft Store App Updates
