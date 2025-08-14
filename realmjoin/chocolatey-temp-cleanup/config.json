@@ -1,0 +1,9 @@
+{
+    "name": "Chocolatey temp folder clean-up",
+    "description": "Remove folders older than 7 days from chocolatey temp folder.",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}

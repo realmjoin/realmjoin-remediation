@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2025-04-14
+- Added Chocolatey temp folder clean-up
+
 ## 2025-07-30
 - Update Mitigate RealmJoin authentication token issues (include new token file)
 
