@@ -22,7 +22,7 @@ try {
         Write-Host "Check: $($dir.FullName) (age: $($Age.Days) days)"
         if ($Age.Days -gt $olderThan) {
             Write-Host "Deleting: $($dir.FullName)"
-            #Remove-Item -Path $dir.FullName -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item -Path $dir.FullName -Recurse -Force -ErrorAction SilentlyContinue
         }
     }
     
@@ -33,11 +33,11 @@ try {
     $sizeMBCleaned = "{0:N2} MB" -f ($sizeCleaned / 1MB)
 
     Write-Host "Cleaned: $($sizeMBCleaned) (before: $($sizeMBBefore), after: $($sizeMBAfter))"
-    #exit 0   
+    exit 0   
 }
 catch {
     # replace new-line with space
     $errMsg = $_.Exception.Message.replace("`n"," ")
     Write-Error $errMsg
-    #exit 1
+    exit 1
 }
