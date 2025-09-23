@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2025-09-23
+- Update Install capability Defender Sense Client
+
 ## 2025-04-14
 - Added Chocolatey temp folder clean-up
 
