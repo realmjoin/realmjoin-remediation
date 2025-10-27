@@ -2,7 +2,7 @@
     "name": "Remove HP applications",
     "description": "Uninstall a list of unwanted (pre-installed) HP applications.",
     "type": "DetectAndRemediate",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "runAsAccountType": "System",
     "enforceSignatureCheck": false,
     "runAs32Bit": false

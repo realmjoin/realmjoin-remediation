@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2025-10-27
+- Updated Remove HP applications
+
 ## 2025-09-23
 - Update Install capability Defender Sense Client
 
