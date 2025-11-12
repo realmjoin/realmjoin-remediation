@@ -37,10 +37,10 @@ if($null -ne $nameTemplate) {
 
 		# compare with current hostname
 		if($desiredName -eq $hostname) {
-			Write-Host "Device name compliant. Name: $($hostname)"
+			Write-Host "Device name compliant. Name: $($hostname), SN: $($serial)"
     		exit 0
 		} else {
-			Write-Host "Device name not compliant. Name: $($hostname), Desired: $($desiredName)"
+			Write-Host "Device name not compliant. Name: $($hostname), Desired: $($desiredName), SN: $($serial)"
     		exit 1
 		}
 	} else {
