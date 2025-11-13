@@ -1,0 +1,9 @@
+{
+    "name": "Align device name with Autopilot profile",
+    "description": "Checks if current hostname matches with device name template defined via Autopilot profile",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
