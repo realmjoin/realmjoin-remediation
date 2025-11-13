@@ -1,6 +1,6 @@
 # RealmJoin Remediation Scripts Changelog
 
-## 2025-11-12
+## 2025-11-13
 - Added Align device name with Autopilot profile
 
 ## 2025-10-27

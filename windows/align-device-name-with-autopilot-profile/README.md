@@ -8,3 +8,4 @@ Checks if current hostname matches with device name template defined via Autopil
 - handles special cases:
     - no serial number available (throw error)
     - device name exceeds 15 characters (SN will be cut off from the left)
+    - serial number contains hyphens (will be removed)

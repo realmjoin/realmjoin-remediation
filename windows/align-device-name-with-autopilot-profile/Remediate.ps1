@@ -2,14 +2,14 @@
 #
 # Script Name:         Remediate.ps1
 # Description:         Rename hostname based on device name template
-# Changelog:           2025-11-12: Inital version
+# Changelog:           2025-11-13: Inital version
 #
 #=============================================================================================================================
 
 # define Variables
 $hostname = $env:COMPUTERNAME
-$serial = (Get-WmiObject -Class Win32_BIOS -ErrorAction SilentlyContinue).SerialNumber
-if ([string]::IsNullOrWhiteSpace($serial)) {
+$originalSerial = (Get-WmiObject -Class Win32_BIOS -ErrorAction SilentlyContinue).SerialNumber
+if ([string]::IsNullOrWhiteSpace($originalSerial)) {
     Write-Host "No serial number found. Cannot remediate."
     exit 1
 }
@@ -27,6 +27,8 @@ try {
         # search for existence of variable in template
         if ($nameTemplate -match $templateVariable) {
 
+            # check if SN contains hyphens and remove them
+		    $serial = $originalSerial -replace "-",""
             # insert SN for templateVariable
             $desiredName = $nameTemplate.Replace($templateVariable, $serial)
             # shorten SN if too long
@@ -39,7 +41,7 @@ try {
 
             # apply hostname
             Rename-Computer -NewName $desiredName -Force
-            Write-Host "Renamed. From: $($hostname), To: $($desiredName), SN: $($serial)"
+            Write-Host "Renamed. From: $($hostname), To: $($desiredName), SN: $($originalSerial)"
             exit 0
         }
         else {
