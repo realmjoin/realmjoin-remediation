@@ -1,0 +1,9 @@
+{
+    "name": "Remove 'Learn about this picture' Windows Spotlight shortcut",
+    "description": "Removes the 'Learn about this picture' shortcut from Windows Spotlight settings.",
+    "type": "[DetectAndRemediate]",
+    "version": "1.0.0",
+    "runAsAccountType": "[User]",
+    "enforceSignatureCheck": [false],
+    "runAs32Bit": [false]
+}
