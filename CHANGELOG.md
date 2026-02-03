@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2026-02-03
+- Added Remove Windows Spotlight desktop shortcut
+
 ## 2025-11-13
 - Added Align device name with Autopilot profile
 
