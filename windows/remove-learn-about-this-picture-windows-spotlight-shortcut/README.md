@@ -1,5 +1,5 @@
-# [Create a HKCU regkey to disable a Desktop Shortcut]
-Removes the "learn about this picture" shortcut from the desktop when using Windows Spotlight
+# Remove Windows Spotlight desktop shortcut
+Removes the "Learn about this picture" desktop shortcut added by Windows Spotlight.
 
-Based of this article:
+Reference:
 https://learn.microsoft.com/en-us/answers/questions/2157455/how-to-remove-a-persistent-shortcut-learn-about-th
