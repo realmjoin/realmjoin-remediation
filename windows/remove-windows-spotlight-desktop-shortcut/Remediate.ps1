@@ -3,7 +3,7 @@
 # Script Name:         Remediate.ps1
 # Description:         Creates registry key for hiding Windows spotlight "Learn about this picture"  desktop shortcut
 # Changelog:           2026-01-23: Inital version
-# References:          ...
+# References:          https://learn.microsoft.com/en-us/answers/questions/2157455/how-to-remove-a-persistent-shortcut-learn-about-th
 # Notes:               ...
 #
 #=============================================================================================================================
