@@ -20,11 +20,11 @@ try {
   
     # Create or update the registry value
     New-ItemProperty -Path $RegPath -Name $ValueName -PropertyType DWord -Value $DesiredValue -Force | Out-Null
-    #exit 0
+    exit 0
 }
 catch {
     # error occured
     $errMsg = $_.Exception.Message
     Write-Error $errMsg
-    #exit 1
+    exit 1
 }
