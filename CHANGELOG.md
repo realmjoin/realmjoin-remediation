@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2026-02-09
+- Added Detect Unauthorized Local Admins
+
 ## 2026-02-03
 - Added Remove Windows Spotlight desktop shortcut
 

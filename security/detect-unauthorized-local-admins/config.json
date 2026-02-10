@@ -1,0 +1,9 @@
+{
+    "name": "Detect Unauthorized Local Admins",
+    "description": "Validates local administrator accounts against RealmJoin LAPS and Windows LAPS policies. Detects unauthorized admins.",
+    "type": "Detect",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
