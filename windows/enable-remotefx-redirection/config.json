@@ -1,0 +1,9 @@
+{
+    "name": "Enable RemoteFX redirection",
+    "description": "Enables required registry settings for RemoteFX USB redirection of 3D peripherals",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
