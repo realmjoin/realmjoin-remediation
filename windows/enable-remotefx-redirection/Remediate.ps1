@@ -2,7 +2,7 @@
 #
 # Script Name:         Remediate.ps1
 # Description:         Set required RemoteFX registry settings for redirecting 3D peripherals to Microsoft VDI (AVD, W365)
-# Synopsis:            2026-02-11: Initial release.
+# Changes:             2026-02-11: Initial release.
 # References:          ...
 # Notes:               HKLM:\Software\Policies\Microsoft\Windows NT\Terminal Services\Client\fUsbRedirectionEnableMode = 2
 #                      HKLM:\System\CurrentControlSet\Control\Class\{36fc9e60-c465-11cf-8056-444553540000}\UpperFilters = TsUsbFlt
