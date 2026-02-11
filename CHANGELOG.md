@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2026-02-11
+- Added RemoteFX redirection for 3D peripherals for Microsoft VDI
+
 ## 2026-02-09
 - Added Detect Unauthorized Local Admins
 
