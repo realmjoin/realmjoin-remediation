@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Detection for Windows Location + Automatic Time Zone.
+    Detection — Enable Windows Location Service with end-user control & Automatic Time Zone Feature.
 
 .DESCRIPTION
     Exits 1 when any of the following is not in the desired state:
@@ -20,22 +20,67 @@
     Dependencies: winsqlite3.dll (Windows 10+ has this in the system by default) *OR* sqlite3.exe (must be copied to the device via other means if used; detection looks for it in %ProgramData%\sqlite-tools\sqlite3.exe)
     Exit codes:   0 = compliant or no user; 1 = drift detected or detection failed
 #>
-Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+# Persistent logging: IME cleans up its per-run stdout/stderr files after reporting results,
+# so failures during Autopilot leave no on-disk trail. Append-only log survives that cleanup.
+$script:LogSource = 'Detection'
+$script:PersistentLogPath = "$env:windir\Logs\glueckkanja\Remediations\enable-location-service-and-automatic-timezone\activity.log"
 
 try {
     # Functions
+    Function Write-PersistentLog {
+        param (
+            [Parameter(Mandatory=$true)][string]$Message,
+            [ValidateSet('Info','Warn','Error')][string]$Level = 'Info'
+        )
+        try {
+            $logDir = Split-Path -Parent $script:PersistentLogPath
+            if (-not (Test-Path $logDir)) { New-Item -Path $logDir -ItemType Directory -Force | Out-Null }
+            # Rotate when the log exceeds 1 MB: any previous backup (.log.1) is overwritten, current file becomes the new .log.1, a fresh file starts.
+            if ((Test-Path $script:PersistentLogPath) -and ((Get-Item $script:PersistentLogPath).Length -gt 1MB)) {
+                $backupPath = "$script:PersistentLogPath.1"
+                if (Test-Path $backupPath) { Remove-Item -Path $backupPath -Force -ErrorAction SilentlyContinue }
+                Move-Item -Path $script:PersistentLogPath -Destination $backupPath -Force -ErrorAction SilentlyContinue
+            }
+            $stamp = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss.fff')
+            Add-Content -Path $script:PersistentLogPath -Value ("{0} [{1}] [{2}] {3}" -f $stamp, $Level, $script:LogSource, $Message) -ErrorAction SilentlyContinue
+        } catch {
+            # Logging is best-effort; never let it fail the script
+        }
+    }
+
+    Function Wait-ForReadiness {
+        # Polls for two preconditions that may briefly be unavailable during early Autopilot User ESP:
+        #   - CAM DB file exists (camsvc creates it on first user sign-in)
+        #   - HKU hive for the user SID is loaded
+        # Returns $true as soon as both are present, $false if the timeout elapses.
+        param (
+            [Parameter(Mandatory=$true)][string]$UserSid,
+            [Parameter(Mandatory=$true)][string]$CamDbPath,
+            [int]$MaxAttempts = 12,
+            [int]$DelaySeconds = 10
+        )
+        for ($i = 1; $i -le $MaxAttempts; $i++) {
+            $dbReady = Test-Path -Path $CamDbPath -PathType Leaf
+            $hiveReady = Test-Path -Path "Registry::HKEY_USERS\$UserSid"
+            if ($dbReady -and $hiveReady) { return $true }
+            if ($i -lt $MaxAttempts) { Start-Sleep -Seconds $DelaySeconds }
+        }
+        return $false
+    }
+
     Function Test-RegistryValueExists {
+        # Non-throwing existence check. Avoid -ErrorAction Stop inside try/catch because PS 5.1's
+        # Start-Transcript logs the raised ErrorRecord verbatim even when it's caught — creates
+        # noise in the forensic transcript.
         param (
             [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$Path,
             [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$ValueName
         )
-        try {
-            $null = Get-ItemPropertyValue -Path $Path -Name $ValueName -ErrorAction Stop
-            return $true
-        } catch {
-            return $false
-        }
+        if (-not (Test-Path -LiteralPath $Path)) { return $false }
+        $props = Get-ItemProperty -LiteralPath $Path -ErrorAction SilentlyContinue
+        return ($null -ne $props -and $props.PSObject.Properties.Name -contains $ValueName)
     }
 
     Function Get-RegistryValueOrNull {
@@ -43,11 +88,10 @@ try {
             [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$Path,
             [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$ValueName
         )
-        try {
-            return Get-ItemPropertyValue -Path $Path -Name $ValueName -ErrorAction Stop
-        } catch {
-            return $null
-        }
+        if (-not (Test-Path -LiteralPath $Path)) { return $null }
+        $props = Get-ItemProperty -LiteralPath $Path -ErrorAction SilentlyContinue
+        if ($null -eq $props -or $props.PSObject.Properties.Name -notcontains $ValueName) { return $null }
+        return $props.$ValueName
     }
 
     Function Get-CamUserGlobalValue {
@@ -121,10 +165,14 @@ public static extern bool CloseHandle(IntPtr h);
         }
     }
 
+    Write-PersistentLog -Message "Detection invoked."
+
     ## Guard: without an interactive user, the per-user HKU and CAM DB state cannot be evaluated, and remediation would no-op anyway.
     ## Report clean so Intune doesn't retrigger; detection will re-run on the next cycle once a user is logged on.
     if (-not $userSid) {
-        Write-Output "No interactive console user detected; skipping detection."
+        $msg = "No interactive console user detected; skipping detection."
+        Write-Output $msg
+        Write-PersistentLog -Message $msg
         exit 0
     }
 
@@ -182,6 +230,16 @@ public static extern int FinalizeStmt(IntPtr stmt);
 [DllImport("winsqlite3.dll", EntryPoint = "sqlite3_close", CallingConvention = CallingConvention.Cdecl)]
 public static extern int Close(IntPtr db);
 '@
+    }
+
+
+    # Readiness check: during Autopilot User ESP the CAM DB file and/or the HKU hive for the user
+    # may briefly not exist yet. Wait up to 120s for them to appear; if still not ready, defer to the next cycle.
+    if (-not (Wait-ForReadiness -UserSid $userSid -CamDbPath $CamDatabasePath)) {
+        $msg = "Per-user environment not ready after 120s (CAM DB file or HKU hive still missing). Deferring to next cycle."
+        Write-Output $msg
+        Write-PersistentLog -Message $msg -Level 'Warn'
+        exit 0
     }
 
 
@@ -256,17 +314,23 @@ public static extern int Close(IntPtr db);
     }
 
 
-    # Final Output
+    # Final Output — single Write-Output so the Intune portal renders the full report without fragmenting the drift list
     if ($driftReasons.Count -gt 0) {
-        Write-Output "Drift detected. Remediation required:"
-        $driftReasons | ForEach-Object { Write-Output " - $_" }
+        $lines = @("Drift detected. Remediation required:") + ($driftReasons | ForEach-Object { " - $_" })
+        $report = $lines -join "`r`n"
+        Write-Output $report
+        Write-PersistentLog -Message ("Drift detected: " + ($driftReasons -join ' | '))
         exit 1
     } else {
-        Write-Output "Location and timezone services are correctly configured."
+        $msg = "Location and timezone services are correctly configured."
+        Write-Output $msg
+        Write-PersistentLog -Message $msg
         exit 0
     }
 
 } catch {
-    Write-Output "Detection failed: $($_.Exception.Message)"
+    $errMsg = "Detection failed: [$($_.Exception.GetType().Name)] $($_.Exception.Message) (line $($_.InvocationInfo.ScriptLineNumber))"
+    Write-Output $errMsg
+    Write-PersistentLog -Message $errMsg -Level 'Error'
     exit 1
 }

@@ -25,9 +25,15 @@
       - Pair with the matching detection script
 
     Every action produces:
-      - A registry export (.reg) of every affected key to C:\ProgramData\ProfileListRepair\backup-<stamp>\
-      - A transcript log at C:\ProgramData\ProfileListRepair\remediate-<stamp>.log
-      - An Application event log entry (source: ProfileListRepair, ID 4000 on success, 4001 on refusal, 4002 on error)
+      - A registry export (.reg) of every affected key to
+          C:\ProgramData\glueckkanja\Remediations\fix-duplicate-profile-list-sids\backup-<stamp>\
+      - A per-run Start-Transcript at
+          C:\Windows\Logs\glueckkanja\Remediations\fix-duplicate-profile-list-sids\transcripts\remediation-<stamp>.log
+          (forensic evidence; last 10 retained)
+      - Concise operational entries in
+          C:\Windows\Logs\glueckkanja\Remediations\fix-duplicate-profile-list-sids\activity.log
+          (structured, rotates at 1 MB)
+      - An Application event log entry (source: glueckkanja.ProfileListRepair; ID 1000 on repair, 2000 on refusal, 4000 on error)
 
 .NOTES
     Read the transcript before ever concluding this script "worked" on a device.
@@ -39,19 +45,63 @@ param()
 
 #region Bootstrap
 $ErrorActionPreference = 'Stop'
-$base    = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList'
-$stamp   = Get-Date -Format 'yyyyMMdd-HHmmss'
-$logDir  = Join-Path $env:ProgramData 'ProfileListRepair'
-$logFile = Join-Path $logDir "remediate-$stamp.log"
-$backupDir = Join-Path $logDir "backup-$stamp"
 
-New-Item -Path $logDir    -ItemType Directory -Force | Out-Null
+# glueckkanja convention — persistent activity log + forensic transcript for a destructive remediation.
+# activity.log  : concise, rotating (1 MB), structured.                      C:\Windows\Logs\glueckkanja\Remediations\<pkg>\activity.log
+# transcript    : verbose per-run Start-Transcript evidence (keep last 10).  C:\Windows\Logs\glueckkanja\Remediations\<pkg>\transcripts\remediation-<stamp>.log
+# backup .reg   : persistent artifact of every affected key before deletion. C:\ProgramData\glueckkanja\Remediations\<pkg>\backup-<stamp>\
+$script:LogSource = 'Remediation'
+$script:PersistentLogPath = "$env:windir\Logs\glueckkanja\Remediations\fix-duplicate-profile-list-sids\activity.log"
+
+function Write-PersistentLog {
+    param (
+        [Parameter(Mandatory=$true)][string]$Message,
+        [ValidateSet('Info','Warn','Error')][string]$Level = 'Info'
+    )
+    try {
+        $logDir = Split-Path -Parent $script:PersistentLogPath
+        if (-not (Test-Path $logDir)) { New-Item -Path $logDir -ItemType Directory -Force | Out-Null }
+        if ((Test-Path $script:PersistentLogPath) -and ((Get-Item $script:PersistentLogPath).Length -gt 1MB)) {
+            $backupPath = "$script:PersistentLogPath.1"
+            if (Test-Path $backupPath) { Remove-Item -Path $backupPath -Force -ErrorAction SilentlyContinue }
+            Move-Item -Path $script:PersistentLogPath -Destination $backupPath -Force -ErrorAction SilentlyContinue
+        }
+        $stamp = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss.fff')
+        Add-Content -Path $script:PersistentLogPath -Value ("{0} [{1}] [{2}] {3}" -f $stamp, $Level, $script:LogSource, $Message) -ErrorAction SilentlyContinue
+    } catch {
+        # Logging is best-effort; never let it fail the script
+    }
+}
+
+function Start-ForensicTranscript {
+    # Starts a Start-Transcript at the convention transcripts path. Retains at most $MaxFiles per source (oldest deleted).
+    param(
+        [Parameter(Mandatory=$true)][string]$Source,
+        [int]$MaxFiles = 10
+    )
+    $transcriptDir = Join-Path (Split-Path -Parent $script:PersistentLogPath) 'transcripts'
+    if (-not (Test-Path $transcriptDir)) { New-Item -Path $transcriptDir -ItemType Directory -Force | Out-Null }
+    $existing = Get-ChildItem -Path $transcriptDir -Filter "$Source-*.log" -ErrorAction SilentlyContinue |
+                Sort-Object LastWriteTime -Descending
+    if ($existing.Count -ge $MaxFiles) {
+        $existing | Select-Object -Skip ($MaxFiles - 1) | Remove-Item -Force -ErrorAction SilentlyContinue
+    }
+    $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+    $transcriptPath = Join-Path $transcriptDir "$Source-$stamp.log"
+    Start-Transcript -Path $transcriptPath -Append | Out-Null
+    return $transcriptPath
+}
+
+$base      = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList'
+$stamp     = Get-Date -Format 'yyyyMMdd-HHmmss'
+$backupDir = Join-Path $env:ProgramData "glueckkanja\Remediations\fix-duplicate-profile-list-sids\backup-$stamp"
+
 New-Item -Path $backupDir -ItemType Directory -Force | Out-Null
-Start-Transcript -Path $logFile -Append | Out-Null
+$transcriptPath = Start-ForensicTranscript -Source 'remediation'
 
 # Best-effort event source registration. Fails silently if not admin enough;
 # script still runs, just without event-log evidence.
-$eventSource = 'ProfileListRepair'
+$eventSource = 'glueckkanja.ProfileListRepair'
 try {
     if (-not [System.Diagnostics.EventLog]::SourceExists($eventSource)) {
         [System.Diagnostics.EventLog]::CreateEventSource($eventSource, 'Application')
@@ -71,8 +121,9 @@ function Write-RepairEvent {
 }
 
 Write-Host "=== ProfileList remediation $stamp ===" -ForegroundColor Cyan
-Write-Host "Transcript: $logFile"
+Write-Host "Transcript: $transcriptPath"
 Write-Host "Backups:    $backupDir"
+Write-PersistentLog -Message "Remediation invoked. Transcript: $transcriptPath. Backups: $backupDir."
 #endregion
 
 #region Helpers (mirror detection script logic so behavior stays in sync)
@@ -212,8 +263,9 @@ try {
     if (Test-FSLogixPresent) {
         $msg = "REFUSED: FSLogix detected on this device. ProfileList heuristics are unreliable when containers may be unmounted."
         Write-Host $msg -ForegroundColor Yellow
-        Write-RepairEvent -EntryType Warning -EventId 4001 -Message $msg
-        Write-Output "Refused: FSLogix present."
+        Write-RepairEvent -EntryType Warning -EventId 2000 -Message $msg
+        Write-PersistentLog -Message $msg -Level 'Warn'
+        Write-Output $msg
         Stop-Transcript | Out-Null
         exit 1
     }
@@ -227,8 +279,10 @@ try {
     }
 
     if (-not $grouped) {
+        $msg = "Healthy: no duplicate user SIDs."
         Write-Host "No duplicates found. Nothing to do." -ForegroundColor Green
-        Write-Output "Healthy: no duplicate user SIDs."
+        Write-Output $msg
+        Write-PersistentLog -Message $msg
         Stop-Transcript | Out-Null
         exit 0
     }
@@ -236,10 +290,11 @@ try {
     $loadedHives = Get-LoadedUserHives
 }
 catch {
-    $msg = "ERROR during pre-flight: $($_.Exception.Message)"
+    $msg = "ERROR during pre-flight: [$($_.Exception.GetType().Name)] $($_.Exception.Message) (line $($_.InvocationInfo.ScriptLineNumber))"
     Write-Host $msg -ForegroundColor Red
-    Write-RepairEvent -EntryType Error -EventId 4002 -Message $msg
-    Write-Output "Error: pre-flight failed."
+    Write-RepairEvent -EntryType Error -EventId 4000 -Message $msg
+    Write-PersistentLog -Message $msg -Level 'Error'
+    Write-Output $msg
     Stop-Transcript | Out-Null
     exit 1
 }
@@ -259,6 +314,7 @@ foreach ($group in $grouped) {
     if ($sid -in $loadedHives) {
         $line = "SKIP ${sid}: hive currently loaded in HKEY_USERS"
         Write-Host $line -ForegroundColor Yellow
+        Write-PersistentLog -Message $line -Level 'Warn'
         $summaryLines += $line
         $refusals++
         continue
@@ -285,7 +341,8 @@ foreach ($group in $grouped) {
     if ($resolution.Confidence -ne 'High') {
         $line = "SKIP ${sid}: confidence=$($resolution.Confidence) - human review required"
         Write-Host $line -ForegroundColor Yellow
-        Write-RepairEvent -EntryType Warning -EventId 4001 -Message "$line | $($resolution.Reason)"
+        Write-RepairEvent -EntryType Warning -EventId 2000 -Message "$line | $($resolution.Reason)"
+        Write-PersistentLog -Message "$line | $($resolution.Reason)" -Level 'Warn'
         $summaryLines += $line
         $refusals++
         continue
@@ -318,14 +375,16 @@ foreach ($group in $grouped) {
 
         $line = "REPAIRED ${sid}: kept $($winner.KeyName), deleted $($losers.Count) sibling(s) [$($resolution.Reason)]"
         Write-Host $line -ForegroundColor Green
-        Write-RepairEvent -EntryType Information -EventId 4000 -Message $line
+        Write-RepairEvent -EntryType Information -EventId 1000 -Message $line
+        Write-PersistentLog -Message $line
         $summaryLines += $line
         $actionsTaken++
     }
     catch {
-        $line = "ERROR ${sid}: $($_.Exception.Message)"
+        $line = "ERROR ${sid}: [$($_.Exception.GetType().Name)] $($_.Exception.Message) (line $($_.InvocationInfo.ScriptLineNumber))"
         Write-Host $line -ForegroundColor Red
-        Write-RepairEvent -EntryType Error -EventId 4002 -Message $line
+        Write-RepairEvent -EntryType Error -EventId 4000 -Message $line
+        Write-PersistentLog -Message $line -Level 'Error'
         $summaryLines += $line
         $errors++
     }
@@ -337,10 +396,16 @@ Write-Host ""
 Write-Host "=== Summary ===" -ForegroundColor Cyan
 Write-Host "Repaired: $actionsTaken | Refused: $refusals | Errors: $errors"
 
-# Intune dashboard output: one line, summarizes everything
-$output = "Repaired=$actionsTaken; Refused=$refusals; Errors=$errors"
-if ($summaryLines) { $output += " | " + ($summaryLines -join ' ;; ') }
+# Intune dashboard output: one Write-Output with `r`n-joined bullet list so the portal renders the summary readably.
+$headline = "Repaired=$actionsTaken; Refused=$refusals; Errors=$errors"
+$lines = @($headline)
+if ($summaryLines) { $lines += $summaryLines | ForEach-Object { " - $_" } }
+$output = $lines -join "`r`n"
 Write-Output $output
+# activity.log stays inline-separated — one timestamped log line per run, not a multi-line entry.
+$summaryLevel = if ($errors -gt 0) { 'Error' } elseif ($refusals -gt 0) { 'Warn' } else { 'Info' }
+$logLine = $headline + $(if ($summaryLines) { " | " + ($summaryLines -join ' ;; ') } else { '' })
+Write-PersistentLog -Message $logLine -Level $summaryLevel
 
 Stop-Transcript | Out-Null
 

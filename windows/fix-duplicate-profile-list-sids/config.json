@@ -2,7 +2,7 @@
     "name": "Fix Duplicate ProfileList SIDs",
     "description": "Automatically repairs high-confidence duplicate ProfileList SIDs that block Windows Reset / in-place upgrade.",
     "type": "DetectAndRemediate",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "runAsAccountType": "System",
     "enforceSignatureCheck": false,
     "runAs32Bit": false

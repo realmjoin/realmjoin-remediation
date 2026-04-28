@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Remediation for Windows Location + Automatic Time Zone.
+    Remediation — Enable Windows Location Service with end-user control & Automatic Time Zone Feature.
 
 .DESCRIPTION
     Corrects drift to enable the Windows Location capability and Automatic Time Zone:
@@ -17,28 +17,100 @@
 
     If no interactive console user is present, exits 0 — Intune retries next cycle.
 
+    Every attempted run (past the no-user guard and readiness check) produces:
+      - Concise structured entries in
+          C:\Windows\Logs\glueckkanja\Remediations\enable-location-service-and-automatic-timezone\activity.log
+          (rotates at 1 MB)
+      - A verbose Start-Transcript at
+          C:\Windows\Logs\glueckkanja\Remediations\enable-location-service-and-automatic-timezone\transcripts\remediation-<stamp>.log
+          (forensic evidence; last 10 retained)
+
 .NOTES
     Run as:       SYSTEM, 64-bit PowerShell
     Assignment:   Users (not devices) — required to resolve the console user SID
     Dependencies: winsqlite3.dll (Windows 10+ has this in the system by default) *OR* sqlite3.exe (must be copied to the device via other means if used; detection looks for it in %ProgramData%\sqlite-tools\sqlite3.exe)
     Exit codes:   0 = success (with or without drift correction); 1 = failure
 #>
-Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+# Persistent logging: IME cleans up its per-run stdout/stderr files after reporting results,
+# so failures during Autopilot leave no on-disk trail. Append-only log survives that cleanup.
+$script:LogSource = 'Remediation'
+$script:PersistentLogPath = "$env:windir\Logs\glueckkanja\Remediations\enable-location-service-and-automatic-timezone\activity.log"
 
 try {
     # Functions
+    Function Write-PersistentLog {
+        param (
+            [Parameter(Mandatory=$true)][string]$Message,
+            [ValidateSet('Info','Warn','Error')][string]$Level = 'Info'
+        )
+        try {
+            $logDir = Split-Path -Parent $script:PersistentLogPath
+            if (-not (Test-Path $logDir)) { New-Item -Path $logDir -ItemType Directory -Force | Out-Null }
+            # Rotate when the log exceeds 1 MB: any previous backup (.log.1) is overwritten, current file becomes the new .log.1, a fresh file starts.
+            if ((Test-Path $script:PersistentLogPath) -and ((Get-Item $script:PersistentLogPath).Length -gt 1MB)) {
+                $backupPath = "$script:PersistentLogPath.1"
+                if (Test-Path $backupPath) { Remove-Item -Path $backupPath -Force -ErrorAction SilentlyContinue }
+                Move-Item -Path $script:PersistentLogPath -Destination $backupPath -Force -ErrorAction SilentlyContinue
+            }
+            $stamp = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss.fff')
+            Add-Content -Path $script:PersistentLogPath -Value ("{0} [{1}] [{2}] {3}" -f $stamp, $Level, $script:LogSource, $Message) -ErrorAction SilentlyContinue
+        } catch {
+            # Logging is best-effort; never let it fail the script
+        }
+    }
+
+    Function Start-ForensicTranscript {
+        # Starts a Start-Transcript at the convention transcripts path. Retains at most $MaxFiles per source (oldest deleted).
+        param(
+            [Parameter(Mandatory=$true)][string]$Source,
+            [int]$MaxFiles = 10
+        )
+        $transcriptDir = Join-Path (Split-Path -Parent $script:PersistentLogPath) 'transcripts'
+        if (-not (Test-Path $transcriptDir)) { New-Item -Path $transcriptDir -ItemType Directory -Force | Out-Null }
+        $existing = Get-ChildItem -Path $transcriptDir -Filter "$Source-*.log" -ErrorAction SilentlyContinue |
+                    Sort-Object LastWriteTime -Descending
+        if ($existing.Count -ge $MaxFiles) {
+            $existing | Select-Object -Skip ($MaxFiles - 1) | Remove-Item -Force -ErrorAction SilentlyContinue
+        }
+        $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+        $transcriptPath = Join-Path $transcriptDir "$Source-$stamp.log"
+        Start-Transcript -Path $transcriptPath -Append | Out-Null
+        return $transcriptPath
+    }
+
+    Function Wait-ForReadiness {
+        # Polls for two preconditions that may briefly be unavailable during early Autopilot User ESP:
+        #   - CAM DB file exists (camsvc creates it on first user sign-in)
+        #   - HKU hive for the user SID is loaded
+        # Returns $true as soon as both are present, $false if the timeout elapses.
+        param (
+            [Parameter(Mandatory=$true)][string]$UserSid,
+            [Parameter(Mandatory=$true)][string]$CamDbPath,
+            [int]$MaxAttempts = 12,
+            [int]$DelaySeconds = 10
+        )
+        for ($i = 1; $i -le $MaxAttempts; $i++) {
+            $dbReady = Test-Path -Path $CamDbPath -PathType Leaf
+            $hiveReady = Test-Path -Path "Registry::HKEY_USERS\$UserSid"
+            if ($dbReady -and $hiveReady) { return $true }
+            if ($i -lt $MaxAttempts) { Start-Sleep -Seconds $DelaySeconds }
+        }
+        return $false
+    }
+
     Function Test-RegistryValueExists {
+        # Non-throwing existence check. Avoid -ErrorAction Stop inside try/catch because PS 5.1's
+        # Start-Transcript logs the raised ErrorRecord verbatim even when it's caught — creates
+        # noise in the forensic transcript.
         param (
             [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$Path,
             [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$ValueName
         )
-        try {
-            $null = Get-ItemPropertyValue -Path $Path -Name $ValueName -ErrorAction Stop
-            return $true
-        } catch {
-            return $false
-        }
+        if (-not (Test-Path -LiteralPath $Path)) { return $false }
+        $props = Get-ItemProperty -LiteralPath $Path -ErrorAction SilentlyContinue
+        return ($null -ne $props -and $props.PSObject.Properties.Name -contains $ValueName)
     }
 
     Function Get-RegistryValueOrNull {
@@ -46,11 +118,10 @@ try {
             [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$Path,
             [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$ValueName
         )
-        try {
-            return Get-ItemPropertyValue -Path $Path -Name $ValueName -ErrorAction Stop
-        } catch {
-            return $null
-        }
+        if (-not (Test-Path -LiteralPath $Path)) { return $null }
+        $props = Get-ItemProperty -LiteralPath $Path -ErrorAction SilentlyContinue
+        if ($null -eq $props -or $props.PSObject.Properties.Name -notcontains $ValueName) { return $null }
+        return $props.$ValueName
     }
 
     Function Set-RegistryValueIfDifferent {
@@ -154,6 +225,8 @@ try {
     }
 
 
+    Write-PersistentLog -Message "Remediation invoked."
+
     # Vars
     ## Generic
     $timeStamp = [DateTime]::UtcNow.ToFileTime()
@@ -184,7 +257,9 @@ public static extern bool CloseHandle(IntPtr h);
 
     ## Guard: if no interactive user (e.g. Autopilot ESP, logon screen), exit 0 so Intune retries cleanly on the next cycle
     if (-not $userSid) {
-        Write-Output "No interactive console user detected. Skipping remediation; Intune will retry on the next cycle."
+        $msg = "No interactive console user detected. Skipping remediation; Intune will retry on the next cycle."
+        Write-Output $msg
+        Write-PersistentLog -Message $msg
         exit 0
     }
 
@@ -264,6 +339,23 @@ public static extern int Close(IntPtr db);
 '@
     }
 
+    # Readiness check: during Autopilot User ESP the CAM DB file and/or the HKU hive for the user
+    # may briefly not exist yet. Wait up to 120s for them to appear; if still not ready, defer to the next cycle.
+    if (-not (Wait-ForReadiness -UserSid $userSid -CamDbPath $CamDatabasePath)) {
+        $msg = "Per-user environment not ready after 120s (CAM DB file or HKU hive still missing). Deferring to next cycle."
+        Write-Output $msg
+        Write-PersistentLog -Message $msg -Level 'Warn'
+        exit 0
+    }
+
+
+    # Forensic transcript: the remediation touches HKLM + HKU regs, the CAM SQLite DB, services, and invokes SystemSettingsAdminFlows.
+    # Capture a verbose per-run trail for post-incident review. Started only after the no-user guard and readiness check pass, so we
+    # don't accumulate transcripts for runs that never did any destructive work.
+    $transcriptPath = Start-ForensicTranscript -Source 'remediation'
+    Write-PersistentLog -Message "Transcript: $transcriptPath"
+
+
     # Tracks whether registry drift or CAM DB drift was detected. Expensive CAM work and service restarts gate on this so idempotent re-runs are no-ops.
     $changed = $false
 
@@ -321,8 +413,26 @@ public static extern int Close(IntPtr db);
 
     # 7. CAM work: only run the expensive admin flow + CAM DB write + service restarts if any drift was detected above
     if ($changed) {
-        ## 7a. Execute the administrative flow to flip the master switch in the CAM database
-        $adminFlow = Start-Process -FilePath $SystemSettingsAdminFlowsFullPath -ArgumentList $SystemSettingsAdminFlowsArgs -Wait -PassThru
+        ## 7a. Execute the administrative flow to flip the master switch in the CAM database.
+        ## Retry on transient launch failures — during early Autopilot, SystemSettingsAdminFlows.exe
+        ## can fail to start (CreateProcess returns file-not-found / InvalidOperationException) even
+        ## though the binary is on disk, because the UWP/settings runtime it depends on isn't fully up yet.
+        $adminFlow = $null
+        $adminFlowMaxAttempts = 3
+        $adminFlowDelaySeconds = 5
+        for ($attempt = 1; $attempt -le $adminFlowMaxAttempts; $attempt++) {
+            try {
+                $adminFlow = Start-Process -FilePath $SystemSettingsAdminFlowsFullPath -ArgumentList $SystemSettingsAdminFlowsArgs -Wait -PassThru
+                break
+            } catch {
+                if ($attempt -lt $adminFlowMaxAttempts) {
+                    Write-PersistentLog -Message "SystemSettingsAdminFlows.exe launch attempt $attempt of $adminFlowMaxAttempts failed: $($_.Exception.Message). Retrying in ${adminFlowDelaySeconds}s." -Level 'Warn'
+                    Start-Sleep -Seconds $adminFlowDelaySeconds
+                } else {
+                    throw
+                }
+            }
+        }
         if ($adminFlow.ExitCode -ne 0) {
             throw "SystemSettingsAdminFlows.exe exited with code $($adminFlow.ExitCode)."
         }
@@ -367,7 +477,11 @@ DO UPDATE SET Value = 1;
         ## 7d. Start camsvc back up
         Start-Service -Name $camServiceSvcName
 
-        ## 7e. Restart Geolocation service (lfsvc) again to pick up the CAM changes ($changed is already $true here, return is discarded)
+        # 7e. Set User ConsentStore and timestamp regs again to pick up the CAM changes ($changed is already $true here, return is discarded)
+        Set-RegistryValueIfDifferent -Path $ConsentStoreUserRegKey -ValueName $ConsentStoreUserRegValue1Name -Value $ConsentStoreUserRegValue1Data -Type $ConsentStoreUserRegValue1Type | Out-Null
+        Set-RegistryValueIfMissing -Path $ConsentStoreUserRegKey -ValueName $ConsentStoreUserRegValue2Name -Value $ConsentStoreUserRegValue2Data -Type $ConsentStoreUserRegValue2Type | Out-Null
+
+        ## 7f. Restart Geolocation service (lfsvc) again to pick up the CAM changes ($changed is already $true here, return is discarded)
         Set-ServiceState -Name $locationServiceSvcName -StartupType $locationServiceSvcStartupType -ForceRestart | Out-Null
     }
 
@@ -380,13 +494,19 @@ DO UPDATE SET Value = 1;
 
     # Final Output
     if ($changed) {
-        Write-Output "Remediation successful: drift corrected."
+        $msg = "Remediation successful: drift corrected."
     } else {
-        Write-Output "Remediation successful: no drift detected."
+        $msg = "Remediation successful: no drift detected."
     }
+    Write-Output $msg
+    Write-PersistentLog -Message $msg
+    try { Stop-Transcript | Out-Null } catch { }
     exit 0
 
 } catch {
-    Write-Output "Remediation failed: $($_.Exception.Message)"
+    $errMsg = "Remediation failed: [$($_.Exception.GetType().Name)] $($_.Exception.Message) (line $($_.InvocationInfo.ScriptLineNumber))"
+    Write-Output $errMsg
+    Write-PersistentLog -Message $errMsg -Level 'Error'
+    try { Stop-Transcript | Out-Null } catch { }
     exit 1
 }

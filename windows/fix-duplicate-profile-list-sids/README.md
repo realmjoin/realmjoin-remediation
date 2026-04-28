@@ -18,9 +18,10 @@ All other cases (`Medium`, `Low`, `None`, loaded user hives, FSLogix-managed dev
 
 ## Safety
 
-- Every affected key is exported to `.reg` in `C:\ProgramData\ProfileListRepair\backup-<timestamp>\` before any delete
-- Full transcript per run in the same folder
-- Application event log entries (source `ProfileListRepair`, IDs `4000` / `4001` / `4002`) for repair, refusal, and error
+- Every affected key is exported to `.reg` in `C:\ProgramData\glueckkanja\Remediations\fix-duplicate-profile-list-sids\backup-<timestamp>\` before any delete
+- Full `Start-Transcript` per run at `C:\Windows\Logs\glueckkanja\Remediations\fix-duplicate-profile-list-sids\transcripts\remediation-<timestamp>.log` (last 10 retained)
+- Concise structured operational log at `C:\Windows\Logs\glueckkanja\Remediations\fix-duplicate-profile-list-sids\activity.log` (rotates at 1 MB, single backup)
+- Application event log entries (source `glueckkanja.ProfileListRepair`; ID `1000` on repair, `2000` on refusal, `4000` on error)
 - Refusal exits non-zero so Intune keeps the device flagged for triage
 
 ## Out of scope

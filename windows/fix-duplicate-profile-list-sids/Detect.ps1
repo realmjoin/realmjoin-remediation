@@ -32,6 +32,31 @@
 param()
 
 $ErrorActionPreference = 'Stop'
+
+# glueckkanja convention — persistent activity log (rotates at 1 MB, single backup)
+$script:LogSource = 'Detection'
+$script:PersistentLogPath = "$env:windir\Logs\glueckkanja\Remediations\fix-duplicate-profile-list-sids\activity.log"
+
+function Write-PersistentLog {
+    param (
+        [Parameter(Mandatory=$true)][string]$Message,
+        [ValidateSet('Info','Warn','Error')][string]$Level = 'Info'
+    )
+    try {
+        $logDir = Split-Path -Parent $script:PersistentLogPath
+        if (-not (Test-Path $logDir)) { New-Item -Path $logDir -ItemType Directory -Force | Out-Null }
+        if ((Test-Path $script:PersistentLogPath) -and ((Get-Item $script:PersistentLogPath).Length -gt 1MB)) {
+            $backupPath = "$script:PersistentLogPath.1"
+            if (Test-Path $backupPath) { Remove-Item -Path $backupPath -Force -ErrorAction SilentlyContinue }
+            Move-Item -Path $script:PersistentLogPath -Destination $backupPath -Force -ErrorAction SilentlyContinue
+        }
+        $stamp = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss.fff')
+        Add-Content -Path $script:PersistentLogPath -Value ("{0} [{1}] [{2}] {3}" -f $stamp, $Level, $script:LogSource, $Message) -ErrorAction SilentlyContinue
+    } catch {
+        # Logging is best-effort; never let it fail the script
+    }
+}
+
 $base = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList'
 
 # User account SID patterns we care about. Everything else is ignored.
@@ -275,6 +300,8 @@ function Resolve-InUseEntry {
 }
 
 try {
+    Write-PersistentLog -Message "Detection invoked."
+
     $keys = Get-ChildItem -Path $base -ErrorAction Stop
 
     # Group by SID (strip trailing .bak / .bak_<n> suffixes) and keep only user SIDs.
@@ -285,7 +312,9 @@ try {
     }
 
     if (-not $grouped) {
-        Write-Output "ProfileList healthy: no duplicate user SIDs."
+        $msg = "ProfileList healthy: no duplicate user SIDs."
+        Write-Output $msg
+        Write-PersistentLog -Message $msg
         exit 0
     }
 
@@ -311,11 +340,17 @@ try {
             $resolution.Reason, ($entryStrs -join ' ;; '))
     }
 
-    Write-Output ("DuplicateProfileListSIDs: " + ($reportLines -join ' || '))
+    # One Write-Output with real line breaks so the Intune portal renders the list readably.
+    $lines = @("Duplicate ProfileList SIDs detected. Remediation required:") + ($reportLines | ForEach-Object { " - $_" })
+    $output = $lines -join "`r`n"
+    Write-Output $output
+    Write-PersistentLog -Message ("Drift detected: " + ($reportLines -join ' | ')) -Level 'Warn'
     exit 1
 }
 catch {
     # Fail closed: don't flag devices because detection itself broke.
-    Write-Output "Detection error: $($_.Exception.Message)"
+    $errMsg = "Detection error: [$($_.Exception.GetType().Name)] $($_.Exception.Message) (line $($_.InvocationInfo.ScriptLineNumber))"
+    Write-Output $errMsg
+    Write-PersistentLog -Message $errMsg -Level 'Error'
     exit 0
 }

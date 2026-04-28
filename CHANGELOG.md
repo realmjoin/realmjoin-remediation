@@ -1,5 +1,9 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2026-04-25
+- Updated Enable Windows Location Service with end-user control & Automatic Time Zone Feature (Improved resilience when running during ESP; Improved Logging)
+- Updated Fix Duplicate ProfileList SIDs (Improved Logging)
+
 ## 2026-04-23
 - Added Enable Windows Location Service with end-user control & Automatic Time Zone Feature
 
