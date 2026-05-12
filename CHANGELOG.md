@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2026-05-12
+- Updated Deactivate the management of M365 Apps through cloud update
+
 ## 2026-04-25
 - Updated Enable Windows Location Service with end-user control & Automatic Time Zone Feature (Improved resilience when running during ESP; Improved Logging)
 - Updated Fix Duplicate ProfileList SIDs (Improved Logging)
