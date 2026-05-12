@@ -2,7 +2,8 @@
 #
 # Script Name:         Remediate.ps1
 # Description:         Detect if device is onboarded and locked to M365 Apps Cloud Update. If onboarded/locked, remediation starts and sets a registry key to offboard it.
-# Changelog:           2025-02-14: Improved handling to also support "choose your own" channel scenarios
+# Changelog:           2025-05-12: Added create of registry path if not exists to prevent remediation failure
+#                      2025-02-14: Improved handling to also support "choose your own" channel scenarios
 #                      2025-02-10: Initial version
 #
 #=============================================================================================================================
@@ -27,14 +28,14 @@ try {
 
     ## UpdatePath
     $keyNameUpdatePath = "updatepath"
-    $keyExistsUpdatePath = $null    
+    $keyExistsUpdatePath = $null
 
     # Functions
     Function Test-RegistryPath {
         param (
             [parameter(Mandatory=$true)][ValidateNotNullOrEmpty()]$Path
         )
-        
+
         try {
             Test-Path $Path -ErrorAction Stop | Out-Null
             return $true
@@ -48,7 +49,7 @@ try {
             [parameter(Mandatory=$true)][ValidateNotNullOrEmpty()]$Path,
             [parameter(Mandatory=$true)][ValidateNotNullOrEmpty()]$Key
         )
-        
+
         try {
             Get-ItemProperty -Path $Path -ErrorAction Stop | Select-Object -ExpandProperty $Key -ErrorAction Stop | Out-Null
             return $true
@@ -62,7 +63,7 @@ try {
             [parameter(Mandatory=$true)][ValidateNotNullOrEmpty()]$Path,
             [parameter(Mandatory=$true)][ValidateNotNullOrEmpty()]$Key
         )
-        
+
         try {
             $Value = Get-ItemPropertyValue -Path $Path -Name $Key -ErrorAction Stop
             return $Value
@@ -88,6 +89,9 @@ try {
         }
         if ($valueIsWrongIgnoreGPO) {
             Write-Host "Setting Key $keyNameIgnoreGPO to $desiredValueIgnoreGPO"
+            if (-not (Test-Path $cloudUpdatePath)) {
+                New-Item -Path $cloudUpdatePath -Force | Out-Null
+            }
             Set-ItemProperty -Path $cloudUpdatePath -Name $keyNameIgnoreGPO -Value $desiredValueIgnoreGPO -Type $keyTypeIgnoreGPO -Force
         }
 
