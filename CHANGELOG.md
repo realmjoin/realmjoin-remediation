@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2026-06-04
+- Added Manage Remote Desktop Users group
+
 ## 2026-05-12
 - Updated Deactivate the management of M365 Apps through cloud update
 
