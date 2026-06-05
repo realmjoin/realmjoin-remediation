@@ -1,0 +1,9 @@
+{
+  "name": "Manage Remote Desktop Users group",
+  "description": "Manages membership of Remote Desktop Users group by adding Entra accounts active within the last 8 weeks and removing those that are not.",
+  "type": "DetectAndRemediate",
+  "version": "1.0.0",
+  "runAsAccountType": "System",
+  "enforceSignatureCheck": false,
+  "runAs32Bit": false
+}
