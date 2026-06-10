@@ -1,0 +1,9 @@
+{
+    "name": "Remove Intel Connectivity Performance Suite",
+    "description": "Removes Intel Connectivity Performance Suite AppxPackage, ICPS PnP drivers and Intel Network Connectivity Service.",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}

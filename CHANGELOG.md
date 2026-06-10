@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2026-06-10
+- Added Remove Intel Connectivity Performance Suite
+
 ## 2026-06-04
 - Added Manage Remote Desktop Users group
 
