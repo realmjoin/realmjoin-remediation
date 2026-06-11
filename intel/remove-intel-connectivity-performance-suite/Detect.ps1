@@ -4,6 +4,7 @@
 # Description:         Detects Intel Connectivity Performance Suite components:
 #                      AppxPackage, ICPS PnP drivers and Intel Network Connectivity Service.
 # Changelog:           2025-06-10: Initial release.
+#                      2026-06-11: Just report ICPS PnP Drivers.
 # References:          https://www.intel.com/content/www/us/en/support/articles/000093451/wireless/wireless-software.html
 #
 #=============================================================================================================================
@@ -56,7 +57,7 @@ try {
     foreach ($block in $driverBlocks) {
         if ($block -match 'Original Name\s*:\s*(icpsExtension|icpsComponent)') {
             $pubName = if ($block -match 'Published Name\s*:\s*(oem\d+\.inf)') { $Matches[1] } else { 'unknown' }
-            $nonCompliant = $true
+            # $nonCompliant = $true     # drivers are not triggering remediation as Windows Update installs them again
             $foundDrivers.Add($pubName)
         }
     }
