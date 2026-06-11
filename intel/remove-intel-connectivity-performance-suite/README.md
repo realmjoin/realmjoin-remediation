@@ -2,12 +2,10 @@
 
 Performs a clean removal of all Intel Connectivity Performance Suite components following Intel support article [000093451](https://www.intel.com/content/www/us/en/support/articles/000093451/wireless/wireless-software.html).
 
-## What is detected and removed
-
 | Component | Detail |
 |---|---|
 | AppxPackage | `AppUp.IntelConnectivityPerformanceSuite_8j3eq9eme6ctt` – removed for all users and deprovisioned |
-| PnP Drivers | All `oem#.inf` entries matching `icpsExtension` or `icpsComponent` |
+| PnP Drivers | All `oem#.inf` entries matching `icpsExtension` or `icpsComponent` - just detected, not removed as Windows Update installs them again |
 | Service | `IntelNCS`, `IntelNCS2`, `Intel Network Connectivity Service`, `Intel Connectivity Network Service` |
 
 ## Background

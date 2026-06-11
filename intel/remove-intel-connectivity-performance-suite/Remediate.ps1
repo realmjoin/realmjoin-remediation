@@ -2,8 +2,9 @@
 #
 # Script Name:         Remediate.ps1
 # Description:         Removes Intel Connectivity Performance Suite components:
-#                      AppxPackage, ICPS PnP drivers and Intel Network Connectivity Service.
-# Changelog:           2025-06-10: Initial release.
+#                      AppxPackage and Intel Network Connectivity Service.
+# Changelog:           2026-06-10: Initial release.
+#                      2026-06-11: Disabled removal of ICPS PnP Drivers as Windows Update installs them again
 # References:          https://www.intel.com/content/www/us/en/support/articles/000093451/wireless/wireless-software.html
 #
 #=============================================================================================================================
@@ -35,36 +36,37 @@ try {
     }
 
     # ── 2. Remove ICPS PnP Drivers (icpsExtension / icpsComponent) ────────────────────────────────────────────
-    Write-Host "Enumerating installed PnP drivers..."
-    $pnpRaw = & pnputil /enum-drivers 2>&1
+    # Removal not done as drivers are installed via Windows Update again
+    #Write-Host "Enumerating installed PnP drivers..."
+    #$pnpRaw = & pnputil /enum-drivers 2>&1
 
-    $drivers = [System.Collections.Generic.List[hashtable]]::new()
-    $current = $null
+    #$drivers = [System.Collections.Generic.List[hashtable]]::new()
+    #$current = $null
 
-    foreach ($line in $pnpRaw) {
-        if ($line -match '^Published Name\s*:\s*(.+)$') {
-            if ($current) { $drivers.Add($current) }
-            $current = @{ PublishedName = $Matches[1].Trim(); OriginalName = '' }
-        }
-        elseif ($line -match '^Original Name\s*:\s*(.+)$' -and $current) {
-            $current['OriginalName'] = $Matches[1].Trim()
-        }
-    }
-    if ($current) { $drivers.Add($current) }
+    #foreach ($line in $pnpRaw) {
+    #    if ($line -match '^Published Name\s*:\s*(.+)$') {
+    #        if ($current) { $drivers.Add($current) }
+    #        $current = @{ PublishedName = $Matches[1].Trim(); OriginalName = '' }
+    #    }
+    #    elseif ($line -match '^Original Name\s*:\s*(.+)$' -and $current) {
+    #        $current['OriginalName'] = $Matches[1].Trim()
+    #    }
+    #}
+    #if ($current) { $drivers.Add($current) }
 
-    Write-Host "Total drivers enumerated: $($drivers.Count)"
+    #Write-Host "Total drivers enumerated: $($drivers.Count)"
 
-    $icpsDrivers = $drivers | Where-Object { $_.OriginalName -match 'icpsExtension|icpsComponent' }
+    #$icpsDrivers = $drivers | Where-Object { $_.OriginalName -match 'icpsExtension|icpsComponent' }
 
-    if (-not $icpsDrivers) {
-        Write-Host "No ICPS drivers found - nothing to remove."
-    } else {
-        foreach ($drv in $icpsDrivers) {
-            Write-Host "Removing driver: $($drv.PublishedName) (original: $($drv.OriginalName))"
-            $result = & pnputil /delete-driver $drv.PublishedName /uninstall 2>&1
-            Write-Host "pnputil result: $($result -join ' | ')"
-        }
-    }
+    #if (-not $icpsDrivers) {
+    #    Write-Host "No ICPS drivers found - nothing to remove."
+    #} else {
+    #    foreach ($drv in $icpsDrivers) {
+    #        Write-Host "Removing driver: $($drv.PublishedName) (original: $($drv.OriginalName))"
+    #        $result = & pnputil /delete-driver $drv.PublishedName /uninstall 2>&1
+    #        Write-Host "pnputil result: $($result -join ' | ')"
+    #    }
+    #}
 
     # ── 3. Remove Intel Connectivity Performance Suite AppxPackage ────────────────────────────────────────────
     $icpsName = 'AppUp.IntelConnectivityPerformanceSuite'
