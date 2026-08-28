@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2026-08-28
+- Added Prefer IPv4 over IPv6
+
 ## 2026-06-11
 - Updated Remove Intel Connectivity Performance Suite
 
