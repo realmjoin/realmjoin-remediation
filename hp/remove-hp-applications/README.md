@@ -15,6 +15,3 @@ Uninstalls the following list of (pre-installed) HP applications if found:
 - HP Wolf Security Application Support for Windows
 - HP Wolf Security Application Support for Chrome*
 - HP One Agent
-- WXP Insights Agent
-- WXP Insights Analytics
-- WXP Insights Analytics - Dependencies
