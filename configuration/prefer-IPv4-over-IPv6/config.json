@@ -1,0 +1,9 @@
+{
+    "name": "Prefer IPv4 over IPv6",
+    "description": "Configures the prefix policy table to prefer IPv4 over IPv6 via registry key DisabledComponents. IPv6 stays enabled, a reboot is required.",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
