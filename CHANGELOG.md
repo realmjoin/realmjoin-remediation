@@ -1,6 +1,9 @@
 # RealmJoin Remediation Scripts Changelog
 
 ## 2026-08-28
+- Update Remove HP applications to include WXP Insights Agent, WXP Insights Analytics and WXP Insights Analytics - Dependencies.
+
+## 2026-08-28
 - Added Prefer IPv4 over IPv6
 
 ## 2026-06-11
