@@ -51,7 +51,7 @@ try {
         Write-Host "Service $serviceName could not be started ($($_.Exception.Message)). Startup type is set, the service will run on next boot."
     }
 
-    #Success if no errors occured.
+    #Success if no errors occurred.
     exit 0
 
 }
