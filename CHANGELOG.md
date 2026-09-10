@@ -3,9 +3,6 @@
 ## 2026-09-09
 - Added Enable Automatic Time Zone Service
 
-## 2026-09-04
-- Added Remove Unauthorized Local Admins
-
 ## 2026-08-28
 - Added Prefer IPv4 over IPv6
 
