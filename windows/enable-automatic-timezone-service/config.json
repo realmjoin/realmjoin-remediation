@@ -1,0 +1,9 @@
+{
+    "name": "Enable Automatic Time Zone Service",
+    "description": "Sets the Automatic Time Zone Updater service (tzautoupdate) to startup type Automatic. For tenants where the Location Service is already enforced via policy.",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
