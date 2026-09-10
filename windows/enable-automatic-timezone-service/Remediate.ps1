@@ -48,7 +48,7 @@ try {
         }
     }
     catch {
-        Write-Host "Service $serviceName could not be started ($($_.Exception.Message)). Startup type is set, the service will run on next boot."
+        Write-Host "Service $serviceName could not be started ($($_.Exception.Message)). Startup type is set; Windows will retry when the service is next triggered."
     }
 
     #Success if no errors occurred.
