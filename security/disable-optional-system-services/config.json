@@ -1,0 +1,9 @@
+{
+    "name": "Disable Optional System Services",
+    "description": "Disables the optional system services of CIS Microsoft Intune for Windows 11 Benchmark v5.0.0, section 82 (Level 1).",
+    "type": "DetectAndRemediate",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
