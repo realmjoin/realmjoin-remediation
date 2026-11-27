@@ -1,5 +1,8 @@
 # RealmJoin Remediation Scripts Changelog
 
+## 2026-11-27
+- Added Detect Hotpatch bug KB5132043
+
 ## 2026-11-17
 - Added Disable Optional System Services (CIS Microsoft Intune for Windows 11 Benchmark v5.0.0, section 82)
 

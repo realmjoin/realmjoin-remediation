@@ -1,0 +1,9 @@
+{
+    "name": "Detect Hotpatch bug KB5132043 (0xC0000099)",
+    "description": "Detect devices affected by the November 2026 hotpatch KB5132043 issue (error 0xC0000099) and report the last logged-on user",
+    "type": "Detect",
+    "version": "1.0.0",
+    "runAsAccountType": "System",
+    "enforceSignatureCheck": false,
+    "runAs32Bit": false
+}
